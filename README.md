@@ -1,7 +1,7 @@
 <p align="center"><img alt="flow" width="350" src=".media/logo.webp"></p>
 
 <p align=center>
-    <a href="https://search.maven.org/artifact/at.florianschuster.store/store-core"><img alt="version" src="https://img.shields.io/maven-central/v/at.florianschuster.store/store-core?label=store-version&logoColor=1AA2D4" /></a>
+    <a href="https://search.maven.org/artifact/at.florianschuster.store/store"><img alt="version" src="https://img.shields.io/maven-central/v/at.florianschuster.store/store?label=version&logoColor=1AA2D4" /></a>
 </p>
 
 <p align=center>
