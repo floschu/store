@@ -6,7 +6,6 @@ import at.florianschuster.store.example.service.InputValidator
 import at.florianschuster.store.example.service.Token
 import at.florianschuster.store.example.service.TokenRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -58,7 +57,7 @@ class LoginStoreTest {
     }
 
     @Test
-    fun `when OnEmailEntered dispatched, then state updates and validation runs`() = runTest {
+    fun `when OnEmailEntered dispatched - then state updates and validation runs`() = runTest {
         with(Setup(backgroundScope)) {
             givenEmailValid = true
             val input = "user@test.com"
@@ -71,7 +70,7 @@ class LoginStoreTest {
     }
 
     @Test
-    fun `when OnPasswordEntered dispatched, then state updates and validation runs`() = runTest {
+    fun `when OnPasswordEntered dispatched- then state updates and validation runs`() = runTest {
         with(Setup(backgroundScope)) {
             givenPasswordValid = true
             val input = "password"
@@ -84,7 +83,7 @@ class LoginStoreTest {
     }
 
     @Test
-    fun `given invalid email, when Authenticate dispatched, then authentication does not proceed`() = runTest {
+    fun `given invalid email- when Authenticate dispatched- then authentication does not proceed`() = runTest {
         with(Setup(backgroundScope)) {
             givenEmailValid = false
             givenPasswordValid = true
@@ -101,12 +100,12 @@ class LoginStoreTest {
             runCurrent()
 
             assertNull(storedToken)
-            assertNull(currentState.authenticationResult)
+            assertEquals(LoginState.AuthenticationResult.Uninitialized, currentState.authenticationResult)
         }
     }
 
     @Test
-    fun `given invalid password, when Authenticate dispatched, then authentication does not proceed`() = runTest {
+    fun `given invalid password- when Authenticate dispatched- then authentication does not proceed`() = runTest {
         with(Setup(backgroundScope)) {
             givenEmailValid = true
             givenPasswordValid = false
@@ -123,12 +122,12 @@ class LoginStoreTest {
             runCurrent()
 
             assertNull(storedToken)
-            assertNull(currentState.authenticationResult)
+            assertEquals(LoginState.AuthenticationResult.Uninitialized, currentState.authenticationResult)
         }
     }
 
     @Test
-    fun `given authentication fails, when Authenticate dispatched, then authenticationResult is Failure`() = runTest {
+    fun `given authentication fails- when Authenticate dispatched- then authenticationResult is Failure`() = runTest {
         with(Setup(backgroundScope)) {
             givenEmailValid = true
             givenPasswordValid = true
@@ -140,13 +139,13 @@ class LoginStoreTest {
             sut.dispatch(LoginAction.Authenticate)
             runCurrent()
 
-            assertEquals(LoginState.Result.Failure, currentState.authenticationResult)
+            assertEquals(LoginState.AuthenticationResult.Failure, currentState.authenticationResult)
             assertNull(storedToken)
         }
     }
 
     @Test
-    fun `given valid credentials, when Authenticate dispatched, then authentication succeeds and token is stored`() =
+    fun `given valid credentials- when Authenticate dispatched- then authentication succeeds and token is stored`() =
         runTest {
             with(Setup(backgroundScope)) {
                 givenEmailValid = true
@@ -163,7 +162,7 @@ class LoginStoreTest {
                 sut.dispatch(LoginAction.Authenticate)
                 runCurrent()
 
-                assertEquals(LoginState.Result.Success, currentState.authenticationResult)
+                assertEquals(LoginState.AuthenticationResult.Success, currentState.authenticationResult)
                 assertEquals(TestToken, storedToken)
             }
         }

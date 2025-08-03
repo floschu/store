@@ -22,7 +22,7 @@ class NavigationStoreTest {
     }
 
     @Test
-    fun `when GoTo Search dispatched, then route is search and cannot go back`() = runTest {
+    fun `when GoTo Search dispatched - then route is search and cannot go back`() = runTest {
         val sut = NavigationStore(backgroundScope)
 
         sut.dispatch(NavigationAction.GoTo(NavigationState.Route.Search))
@@ -35,7 +35,7 @@ class NavigationStoreTest {
 
 
     @Test
-    fun `when GoTo Detail dispatched, then route is detail and can go back`() = runTest {
+    fun `when GoTo Detail dispatched - then route is detail and can go back`() = runTest {
         val sut = NavigationStore(backgroundScope)
 
         val id = "123"
