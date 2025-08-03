@@ -1,6 +1,6 @@
-rootProject.name = "example"
+@file:Suppress("UnstableApiUsage")
 
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+rootProject.name = "example"
 
 pluginManagement {
     repositories {
@@ -28,10 +28,6 @@ dependencyResolutionManagement {
         mavenCentral()
         mavenLocal()
     }
-}
-
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 include(":composeApp")
