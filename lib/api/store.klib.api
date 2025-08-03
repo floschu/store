@@ -1,0 +1,150 @@
+// Klib ABI Dump
+// Targets: [androidNativeArm32, androidNativeArm64, androidNativeX64, androidNativeX86, iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, wasmWasi, watchosArm32, watchosArm64, watchosDeviceArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <at.florianschuster.store:store>
+abstract fun interface at.florianschuster.store/StoreEvents { // at.florianschuster.store/StoreEvents|null[0]
+    abstract fun emit(at.florianschuster.store/StoreEvent) // at.florianschuster.store/StoreEvents.emit|emit(at.florianschuster.store.StoreEvent){}[0]
+
+    final object Companion { // at.florianschuster.store/StoreEvents.Companion|null[0]
+        final fun Println(kotlin/String = ...): at.florianschuster.store/StoreEvents // at.florianschuster.store/StoreEvents.Companion.Println|Println(kotlin.String){}[0]
+    }
+}
+
+abstract interface <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?> at.florianschuster.store/DelegateStore { // at.florianschuster.store/DelegateStore|null[0]
+    abstract val state // at.florianschuster.store/DelegateStore.state|{}state[0]
+        abstract fun <get-state>(): kotlinx.coroutines.flow/StateFlow<#F> // at.florianschuster.store/DelegateStore.state.<get-state>|<get-state>(){}[0]
+
+    abstract fun (at.florianschuster.store/DelegateStore.ExpandStateContext<#A, #B>).expandState(#C, #F): #C // at.florianschuster.store/DelegateStore.expandState|expandState@at.florianschuster.store.DelegateStore.ExpandStateContext<1:0,1:1>(1:2;1:5){}[0]
+    abstract fun dispatch(#B) // at.florianschuster.store/DelegateStore.dispatch|dispatch(1:1){}[0]
+
+    abstract interface <#A1: kotlin/Any?, #B1: kotlin/Any?> ExpandStateContext { // at.florianschuster.store/DelegateStore.ExpandStateContext|null[0]
+        abstract val environment // at.florianschuster.store/DelegateStore.ExpandStateContext.environment|{}environment[0]
+            abstract fun <get-environment>(): #A1 // at.florianschuster.store/DelegateStore.ExpandStateContext.environment.<get-environment>|<get-environment>(){}[0]
+
+        abstract fun add(at.florianschuster.store/Effect<#A1, #B1>) // at.florianschuster.store/DelegateStore.ExpandStateContext.add|add(at.florianschuster.store.Effect<1:0,1:1>){}[0]
+    }
+}
+
+abstract interface <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> at.florianschuster.store/Reducer { // at.florianschuster.store/Reducer|null[0]
+    abstract fun (at.florianschuster.store/Reducer.Context<#A, #B>).reduce(#C, #B): #C // at.florianschuster.store/Reducer.reduce|reduce@at.florianschuster.store.Reducer.Context<1:0,1:1>(1:2;1:1){}[0]
+
+    abstract interface <#A1: kotlin/Any?, #B1: kotlin/Any?> Context { // at.florianschuster.store/Reducer.Context|null[0]
+        abstract val environment // at.florianschuster.store/Reducer.Context.environment|{}environment[0]
+            abstract fun <get-environment>(): #A1 // at.florianschuster.store/Reducer.Context.environment.<get-environment>|<get-environment>(){}[0]
+
+        abstract fun add(at.florianschuster.store/Effect<#A1, #B1>) // at.florianschuster.store/Reducer.Context.add|add(at.florianschuster.store.Effect<1:0,1:1>){}[0]
+    }
+}
+
+abstract interface <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> at.florianschuster.store/Store { // at.florianschuster.store/Store|null[0]
+    abstract val state // at.florianschuster.store/Store.state|{}state[0]
+        abstract fun <get-state>(): kotlinx.coroutines.flow/StateFlow<#C> // at.florianschuster.store/Store.state.<get-state>|<get-state>(){}[0]
+
+    abstract fun dispatch(#B) // at.florianschuster.store/Store.dispatch|dispatch(1:1){}[0]
+}
+
+abstract interface <#A: kotlin/Any?, #B: kotlin/Any?> at.florianschuster.store/EffectCancellation : at.florianschuster.store/Effect<#A, #B> { // at.florianschuster.store/EffectCancellation|null[0]
+    abstract val ids // at.florianschuster.store/EffectCancellation.ids|{}ids[0]
+        abstract fun <get-ids>(): kotlin.collections/List<kotlin/Any> // at.florianschuster.store/EffectCancellation.ids.<get-ids>|<get-ids>(){}[0]
+}
+
+abstract interface <#A: kotlin/Any?, #B: kotlin/Any?> at.florianschuster.store/EffectExecution : at.florianschuster.store/Effect<#A, #B> { // at.florianschuster.store/EffectExecution|null[0]
+    abstract val block // at.florianschuster.store/EffectExecution.block|{}block[0]
+        abstract fun <get-block>(): kotlin.coroutines/SuspendFunction1<at.florianschuster.store/EffectExecution.Context<#A, #B>, kotlin/Unit> // at.florianschuster.store/EffectExecution.block.<get-block>|<get-block>(){}[0]
+    abstract val id // at.florianschuster.store/EffectExecution.id|{}id[0]
+        abstract fun <get-id>(): kotlin/Any? // at.florianschuster.store/EffectExecution.id.<get-id>|<get-id>(){}[0]
+
+    abstract interface <#A1: kotlin/Any?, #B1: kotlin/Any?> Context { // at.florianschuster.store/EffectExecution.Context|null[0]
+        abstract val environment // at.florianschuster.store/EffectExecution.Context.environment|{}environment[0]
+            abstract fun <get-environment>(): #A1 // at.florianschuster.store/EffectExecution.Context.environment.<get-environment>|<get-environment>(){}[0]
+
+        abstract fun dispatch(#B1) // at.florianschuster.store/EffectExecution.Context.dispatch|dispatch(1:1){}[0]
+    }
+}
+
+sealed interface <#A: kotlin/Any?, #B: kotlin/Any?> at.florianschuster.store/Effect // at.florianschuster.store/Effect|null[0]
+
+sealed interface at.florianschuster.store/StoreEvent { // at.florianschuster.store/StoreEvent|null[0]
+    sealed interface Effect : at.florianschuster.store/StoreEvent { // at.florianschuster.store/StoreEvent.Effect|null[0]
+        final class Cancel : at.florianschuster.store/StoreEvent.Effect { // at.florianschuster.store/StoreEvent.Effect.Cancel|null[0]
+            final val effectId // at.florianschuster.store/StoreEvent.Effect.Cancel.effectId|{}effectId[0]
+                final fun <get-effectId>(): kotlin/Any? // at.florianschuster.store/StoreEvent.Effect.Cancel.effectId.<get-effectId>|<get-effectId>(){}[0]
+
+            final fun toString(): kotlin/String // at.florianschuster.store/StoreEvent.Effect.Cancel.toString|toString(){}[0]
+        }
+
+        final class Launch : at.florianschuster.store/StoreEvent.Effect { // at.florianschuster.store/StoreEvent.Effect.Launch|null[0]
+            final val effectId // at.florianschuster.store/StoreEvent.Effect.Launch.effectId|{}effectId[0]
+                final fun <get-effectId>(): kotlin/Any? // at.florianschuster.store/StoreEvent.Effect.Launch.effectId.<get-effectId>|<get-effectId>(){}[0]
+
+            final fun toString(): kotlin/String // at.florianschuster.store/StoreEvent.Effect.Launch.toString|toString(){}[0]
+        }
+    }
+
+    final class <#A1: kotlin/Any?, #B1: kotlin/Any?> ExpandState : at.florianschuster.store/StoreEvent { // at.florianschuster.store/StoreEvent.ExpandState|null[0]
+        final val delegateState // at.florianschuster.store/StoreEvent.ExpandState.delegateState|{}delegateState[0]
+            final fun <get-delegateState>(): #B1 // at.florianschuster.store/StoreEvent.ExpandState.delegateState.<get-delegateState>|<get-delegateState>(){}[0]
+        final val expandedState // at.florianschuster.store/StoreEvent.ExpandState.expandedState|{}expandedState[0]
+            final fun <get-expandedState>(): #A1 // at.florianschuster.store/StoreEvent.ExpandState.expandedState.<get-expandedState>|<get-expandedState>(){}[0]
+        final val previousState // at.florianschuster.store/StoreEvent.ExpandState.previousState|{}previousState[0]
+            final fun <get-previousState>(): #A1 // at.florianschuster.store/StoreEvent.ExpandState.previousState.<get-previousState>|<get-previousState>(){}[0]
+
+        final fun toString(): kotlin/String // at.florianschuster.store/StoreEvent.ExpandState.toString|toString(){}[0]
+    }
+
+    final class <#A1: kotlin/Any?, #B1: kotlin/Any?> Initialization : at.florianschuster.store/StoreEvent { // at.florianschuster.store/StoreEvent.Initialization|null[0]
+        final val environment // at.florianschuster.store/StoreEvent.Initialization.environment|{}environment[0]
+            final fun <get-environment>(): #B1 // at.florianschuster.store/StoreEvent.Initialization.environment.<get-environment>|<get-environment>(){}[0]
+        final val hasInitialEffect // at.florianschuster.store/StoreEvent.Initialization.hasInitialEffect|{}hasInitialEffect[0]
+            final fun <get-hasInitialEffect>(): kotlin/Boolean // at.florianschuster.store/StoreEvent.Initialization.hasInitialEffect.<get-hasInitialEffect>|<get-hasInitialEffect>(){}[0]
+        final val initialState // at.florianschuster.store/StoreEvent.Initialization.initialState|{}initialState[0]
+            final fun <get-initialState>(): #A1 // at.florianschuster.store/StoreEvent.Initialization.initialState.<get-initialState>|<get-initialState>(){}[0]
+
+        final fun toString(): kotlin/String // at.florianschuster.store/StoreEvent.Initialization.toString|toString(){}[0]
+    }
+
+    final class <#A1: kotlin/Any?, #B1: kotlin/Any?> Reduce : at.florianschuster.store/StoreEvent { // at.florianschuster.store/StoreEvent.Reduce|null[0]
+        final val action // at.florianschuster.store/StoreEvent.Reduce.action|{}action[0]
+            final fun <get-action>(): #A1 // at.florianschuster.store/StoreEvent.Reduce.action.<get-action>|<get-action>(){}[0]
+        final val newState // at.florianschuster.store/StoreEvent.Reduce.newState|{}newState[0]
+            final fun <get-newState>(): #B1 // at.florianschuster.store/StoreEvent.Reduce.newState.<get-newState>|<get-newState>(){}[0]
+        final val previousState // at.florianschuster.store/StoreEvent.Reduce.previousState|{}previousState[0]
+            final fun <get-previousState>(): #B1 // at.florianschuster.store/StoreEvent.Reduce.previousState.<get-previousState>|<get-previousState>(){}[0]
+
+        final fun toString(): kotlin/String // at.florianschuster.store/StoreEvent.Reduce.toString|toString(){}[0]
+    }
+
+    final class <#A1: kotlin/Any?> Dispatch : at.florianschuster.store/StoreEvent { // at.florianschuster.store/StoreEvent.Dispatch|null[0]
+        final val action // at.florianschuster.store/StoreEvent.Dispatch.action|{}action[0]
+            final fun <get-action>(): #A1 // at.florianschuster.store/StoreEvent.Dispatch.action.<get-action>|<get-action>(){}[0]
+
+        final fun toString(): kotlin/String // at.florianschuster.store/StoreEvent.Dispatch.toString|toString(){}[0]
+    }
+}
+
+final class <#A: kotlin/Any?, #B: kotlin/Any?> at.florianschuster.store/EffectHandler { // at.florianschuster.store/EffectHandler|null[0]
+    constructor <init>(kotlin/Function1<#B, kotlin/Unit>, kotlinx.coroutines/CoroutineScope, at.florianschuster.store/StoreEvents?, #A) // at.florianschuster.store/EffectHandler.<init>|<init>(kotlin.Function1<1:1,kotlin.Unit>;kotlinx.coroutines.CoroutineScope;at.florianschuster.store.StoreEvents?;1:0){}[0]
+
+    final fun handle(kotlin.collections/List<at.florianschuster.store/Effect<#A, #B>>) // at.florianschuster.store/EffectHandler.handle|handle(kotlin.collections.List<at.florianschuster.store.Effect<1:0,1:1>>){}[0]
+}
+
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?> (at.florianschuster.store/Reducer<#D, #E, #F>).at.florianschuster.store/delegate(#F, #D, kotlinx.coroutines/CoroutineScope, kotlin/Function1<#B, #E?>, kotlin/Function3<at.florianschuster.store/DelegateStore.ExpandStateContext<#A, #B>, #C, #F, #C>, at.florianschuster.store/StoreEvents? = ...): at.florianschuster.store/DelegateStore<#A, #B, #C, #D, #E, #F> // at.florianschuster.store/delegate|delegate@at.florianschuster.store.Reducer<0:3,0:4,0:5>(0:5;0:3;kotlinx.coroutines.CoroutineScope;kotlin.Function1<0:1,0:4?>;kotlin.Function3<at.florianschuster.store.DelegateStore.ExpandStateContext<0:0,0:1>,0:2,0:5,0:2>;at.florianschuster.store.StoreEvents?){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?, #D: kotlin/Any?, #E: kotlin/Any?, #F: kotlin/Any?> (at.florianschuster.store/Store<#D, #E, #F>).at.florianschuster.store/delegate(kotlin/Function1<#B, #E?>, kotlin/Function3<at.florianschuster.store/DelegateStore.ExpandStateContext<#A, #B>, #C, #F, #C>): at.florianschuster.store/DelegateStore<#A, #B, #C, #D, #E, #F> // at.florianschuster.store/delegate|delegate@at.florianschuster.store.Store<0:3,0:4,0:5>(kotlin.Function1<0:1,0:4?>;kotlin.Function3<at.florianschuster.store.DelegateStore.ExpandStateContext<0:0,0:1>,0:2,0:5,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>;3§<kotlin.Any?>;4§<kotlin.Any?>;5§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> at.florianschuster.store/EmptyReducer(): at.florianschuster.store/Reducer<#A, #B, #C> // at.florianschuster.store/EmptyReducer|EmptyReducer(){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> at.florianschuster.store/Reducer(kotlin/Function3<at.florianschuster.store/Reducer.Context<#A, #B>, #C, #B, #C>): at.florianschuster.store/Reducer<#A, #B, #C> // at.florianschuster.store/Reducer|Reducer(kotlin.Function3<at.florianschuster.store.Reducer.Context<0:0,0:1>,0:2,0:1,0:2>){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> at.florianschuster.store/Store(#C, #A, kotlinx.coroutines/CoroutineScope, at.florianschuster.store/Effect<#A, #B>? = ..., at.florianschuster.store/Reducer<#A, #B, #C>, at.florianschuster.store/StoreEvents? = ...): at.florianschuster.store/Store<#A, #B, #C> // at.florianschuster.store/Store|Store(0:2;0:0;kotlinx.coroutines.CoroutineScope;at.florianschuster.store.Effect<0:0,0:1>?;at.florianschuster.store.Reducer<0:0,0:1,0:2>;at.florianschuster.store.StoreEvents?){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?, #C: kotlin/Any?> at.florianschuster.store/Store(#C, #A, kotlinx.coroutines/CoroutineScope, at.florianschuster.store/Effect<#A, #B>? = ..., kotlin.collections/List<at.florianschuster.store/DelegateStore<#A, #B, #C, *, *, *>>, at.florianschuster.store/StoreEvents? = ...): at.florianschuster.store/Store<#A, #B, #C> // at.florianschuster.store/Store|Store(0:2;0:0;kotlinx.coroutines.CoroutineScope;at.florianschuster.store.Effect<0:0,0:1>?;kotlin.collections.List<at.florianschuster.store.DelegateStore<0:0,0:1,0:2,*,*,*>>;at.florianschuster.store.StoreEvents?){0§<kotlin.Any?>;1§<kotlin.Any?>;2§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (at.florianschuster.store/DelegateStore.ExpandStateContext<#A, #B>).at.florianschuster.store/cancelEffect(kotlin/Any) // at.florianschuster.store/cancelEffect|cancelEffect@at.florianschuster.store.DelegateStore.ExpandStateContext<0:0,0:1>(kotlin.Any){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (at.florianschuster.store/DelegateStore.ExpandStateContext<#A, #B>).at.florianschuster.store/cancelEffects(kotlin.collections/List<kotlin/Any>) // at.florianschuster.store/cancelEffects|cancelEffects@at.florianschuster.store.DelegateStore.ExpandStateContext<0:0,0:1>(kotlin.collections.List<kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (at.florianschuster.store/DelegateStore.ExpandStateContext<#A, #B>).at.florianschuster.store/effect(kotlin/Any? = ..., kotlin.coroutines/SuspendFunction1<at.florianschuster.store/EffectExecution.Context<#A, #B>, kotlin/Unit>) // at.florianschuster.store/effect|effect@at.florianschuster.store.DelegateStore.ExpandStateContext<0:0,0:1>(kotlin.Any?;kotlin.coroutines.SuspendFunction1<at.florianschuster.store.EffectExecution.Context<0:0,0:1>,kotlin.Unit>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (at.florianschuster.store/Reducer.Context<#A, #B>).at.florianschuster.store/cancelEffect(kotlin/Any) // at.florianschuster.store/cancelEffect|cancelEffect@at.florianschuster.store.Reducer.Context<0:0,0:1>(kotlin.Any){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (at.florianschuster.store/Reducer.Context<#A, #B>).at.florianschuster.store/cancelEffects(kotlin.collections/List<kotlin/Any>) // at.florianschuster.store/cancelEffects|cancelEffects@at.florianschuster.store.Reducer.Context<0:0,0:1>(kotlin.collections.List<kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> (at.florianschuster.store/Reducer.Context<#A, #B>).at.florianschuster.store/effect(kotlin/Any? = ..., kotlin.coroutines/SuspendFunction1<at.florianschuster.store/EffectExecution.Context<#A, #B>, kotlin/Unit>) // at.florianschuster.store/effect|effect@at.florianschuster.store.Reducer.Context<0:0,0:1>(kotlin.Any?;kotlin.coroutines.SuspendFunction1<at.florianschuster.store.EffectExecution.Context<0:0,0:1>,kotlin.Unit>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> at.florianschuster.store/effect(kotlin/Any? = ..., kotlin.coroutines/SuspendFunction1<at.florianschuster.store/EffectExecution.Context<#A, #B>, kotlin/Unit>): at.florianschuster.store/EffectExecution<#A, #B> // at.florianschuster.store/effect|effect(kotlin.Any?;kotlin.coroutines.SuspendFunction1<at.florianschuster.store.EffectExecution.Context<0:0,0:1>,kotlin.Unit>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (at.florianschuster.store/Store<*, #A, *>).at.florianschuster.store/component2(): kotlin/Function1<#A, kotlin/Unit> // at.florianschuster.store/component2|component2@at.florianschuster.store.Store<*,0:0,*>(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (at.florianschuster.store/Store<*, *, #A>).at.florianschuster.store/component1(): kotlinx.coroutines.flow/StateFlow<#A> // at.florianschuster.store/component1|component1@at.florianschuster.store.Store<*,*,0:0>(){0§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any?, #B: kotlin/Any?> at.florianschuster.store/scopeAction(crossinline kotlin/Function1<#A, #B>): kotlin/Function1<kotlin/Any, #B?> // at.florianschuster.store/scopeAction|scopeAction(kotlin.Function1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]

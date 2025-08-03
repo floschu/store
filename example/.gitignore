@@ -1,5 +1,3 @@
-.kotlin
-
 # Created by https://www.toptal.com/developers/gitignore/api/kotlin,android,swift,macos,web,java,gradle,intellij,androidstudio
 # Edit at https://www.toptal.com/developers/gitignore?templates=kotlin,android,swift,macos,web,java,gradle,intellij,androidstudio
 
@@ -184,6 +182,8 @@ replay_pid*
 
 ### Kotlin ###
 # Compiled class file
+
+.kotlin
 
 # Log file
 

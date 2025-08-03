@@ -1,0 +1,132 @@
+public final class at/florianschuster/store/DelegateKt {
+	public static final fun delegate (Lat/florianschuster/store/Reducer;Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lat/florianschuster/store/StoreEvents;)Lat/florianschuster/store/DelegateStore;
+	public static final fun delegate (Lat/florianschuster/store/Store;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)Lat/florianschuster/store/DelegateStore;
+	public static synthetic fun delegate$default (Lat/florianschuster/store/Reducer;Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Lat/florianschuster/store/StoreEvents;ILjava/lang/Object;)Lat/florianschuster/store/DelegateStore;
+}
+
+public abstract interface class at/florianschuster/store/DelegateStore {
+	public abstract fun dispatch (Ljava/lang/Object;)V
+	public abstract fun expandState (Lat/florianschuster/store/DelegateStore$ExpandStateContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+	public abstract fun getState ()Lkotlinx/coroutines/flow/StateFlow;
+}
+
+public abstract interface class at/florianschuster/store/DelegateStore$ExpandStateContext {
+	public abstract fun add (Lat/florianschuster/store/Effect;)V
+	public abstract fun getEnvironment ()Ljava/lang/Object;
+}
+
+public abstract interface class at/florianschuster/store/Effect {
+}
+
+public abstract interface class at/florianschuster/store/EffectCancellation : at/florianschuster/store/Effect {
+	public abstract fun getIds ()Ljava/util/List;
+}
+
+public abstract interface class at/florianschuster/store/EffectExecution : at/florianschuster/store/Effect {
+	public abstract fun getBlock ()Lkotlin/jvm/functions/Function2;
+	public abstract fun getId ()Ljava/lang/Object;
+}
+
+public abstract interface class at/florianschuster/store/EffectExecution$Context {
+	public abstract fun dispatch (Ljava/lang/Object;)V
+	public abstract fun getEnvironment ()Ljava/lang/Object;
+}
+
+public final class at/florianschuster/store/EffectHandler {
+	public fun <init> (Lkotlin/jvm/functions/Function1;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/StoreEvents;Ljava/lang/Object;)V
+	public final fun handle (Ljava/util/List;)V
+}
+
+public final class at/florianschuster/store/EffectKt {
+	public static final fun cancelEffect (Lat/florianschuster/store/DelegateStore$ExpandStateContext;Ljava/lang/Object;)V
+	public static final fun cancelEffect (Lat/florianschuster/store/Reducer$Context;Ljava/lang/Object;)V
+	public static final fun cancelEffects (Lat/florianschuster/store/DelegateStore$ExpandStateContext;Ljava/util/List;)V
+	public static final fun cancelEffects (Lat/florianschuster/store/Reducer$Context;Ljava/util/List;)V
+	public static final fun effect (Lat/florianschuster/store/DelegateStore$ExpandStateContext;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+	public static final fun effect (Lat/florianschuster/store/Reducer$Context;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+	public static final fun effect (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Lat/florianschuster/store/EffectExecution;
+	public static synthetic fun effect$default (Lat/florianschuster/store/DelegateStore$ExpandStateContext;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static synthetic fun effect$default (Lat/florianschuster/store/Reducer$Context;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static synthetic fun effect$default (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)Lat/florianschuster/store/EffectExecution;
+}
+
+public abstract interface class at/florianschuster/store/Reducer {
+	public abstract fun reduce (Lat/florianschuster/store/Reducer$Context;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface class at/florianschuster/store/Reducer$Context {
+	public abstract fun add (Lat/florianschuster/store/Effect;)V
+	public abstract fun getEnvironment ()Ljava/lang/Object;
+}
+
+public final class at/florianschuster/store/ReducerKt {
+	public static final fun EmptyReducer ()Lat/florianschuster/store/Reducer;
+	public static final fun Reducer (Lkotlin/jvm/functions/Function3;)Lat/florianschuster/store/Reducer;
+}
+
+public abstract interface class at/florianschuster/store/Store {
+	public abstract fun dispatch (Ljava/lang/Object;)V
+	public abstract fun getState ()Lkotlinx/coroutines/flow/StateFlow;
+}
+
+public abstract interface class at/florianschuster/store/StoreEvent {
+}
+
+public final class at/florianschuster/store/StoreEvent$Dispatch : at/florianschuster/store/StoreEvent {
+	public final fun getAction ()Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class at/florianschuster/store/StoreEvent$Effect : at/florianschuster/store/StoreEvent {
+}
+
+public final class at/florianschuster/store/StoreEvent$Effect$Cancel : at/florianschuster/store/StoreEvent$Effect {
+	public final fun getEffectId ()Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class at/florianschuster/store/StoreEvent$Effect$Launch : at/florianschuster/store/StoreEvent$Effect {
+	public final fun getEffectId ()Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class at/florianschuster/store/StoreEvent$ExpandState : at/florianschuster/store/StoreEvent {
+	public final fun getDelegateState ()Ljava/lang/Object;
+	public final fun getExpandedState ()Ljava/lang/Object;
+	public final fun getPreviousState ()Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class at/florianschuster/store/StoreEvent$Initialization : at/florianschuster/store/StoreEvent {
+	public final fun getEnvironment ()Ljava/lang/Object;
+	public final fun getHasInitialEffect ()Z
+	public final fun getInitialState ()Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class at/florianschuster/store/StoreEvent$Reduce : at/florianschuster/store/StoreEvent {
+	public final fun getAction ()Ljava/lang/Object;
+	public final fun getNewState ()Ljava/lang/Object;
+	public final fun getPreviousState ()Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class at/florianschuster/store/StoreEvents {
+	public static final field Companion Lat/florianschuster/store/StoreEvents$Companion;
+	public abstract fun emit (Lat/florianschuster/store/StoreEvent;)V
+}
+
+public final class at/florianschuster/store/StoreEvents$Companion {
+	public final fun Println (Ljava/lang/String;)Lat/florianschuster/store/StoreEvents;
+	public static synthetic fun Println$default (Lat/florianschuster/store/StoreEvents$Companion;Ljava/lang/String;ILjava/lang/Object;)Lat/florianschuster/store/StoreEvents;
+}
+
+public final class at/florianschuster/store/StoreKt {
+	public static final fun Store (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Effect;Lat/florianschuster/store/Reducer;Lat/florianschuster/store/StoreEvents;)Lat/florianschuster/store/Store;
+	public static final fun Store (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Effect;Ljava/util/List;Lat/florianschuster/store/StoreEvents;)Lat/florianschuster/store/Store;
+	public static synthetic fun Store$default (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Effect;Lat/florianschuster/store/Reducer;Lat/florianschuster/store/StoreEvents;ILjava/lang/Object;)Lat/florianschuster/store/Store;
+	public static synthetic fun Store$default (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Effect;Ljava/util/List;Lat/florianschuster/store/StoreEvents;ILjava/lang/Object;)Lat/florianschuster/store/Store;
+	public static final fun component1 (Lat/florianschuster/store/Store;)Lkotlinx/coroutines/flow/StateFlow;
+	public static final fun component2 (Lat/florianschuster/store/Store;)Lkotlin/jvm/functions/Function1;
+}
+
