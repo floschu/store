@@ -26,7 +26,7 @@ see [changelog](https://github.com/floschu/store/blob/main/CHANGELOG.md) for ver
 
 ## usage
 
-Go to [store](https://github.com/floschu/store/blob/main/src/commonMain/kotlin/at/florianschuster/store/store.kt) as entry point for more information.
+Go to [store](https://github.com/floschu/store/blob/main/lib/src/commonMain/kotlin/at/florianschuster/store/Store.kt) as entry point for more information.
 
 ```kotlin
 class LoginEnvironment(
