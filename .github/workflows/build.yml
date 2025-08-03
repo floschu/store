@@ -39,7 +39,7 @@ jobs:
         with:
           gradle-version: wrapper
           add-job-summary: on-failure
-      #- name: "build"
-      #  run: |
-      #    cd example
-      #    ./gradlew build
+      - name: "build"
+        run: |
+          cd example
+          ./gradlew build
