@@ -22,11 +22,11 @@ dependencies {
 }
 ```
 
-see [changelog](https://github.com/floschu/store/blob/develop/CHANGELOG.md) for versions
+see [changelog](https://github.com/floschu/store/blob/main/CHANGELOG.md) for versions
 
 ## usage
 
-Go to [store](https://github.com/floschu/store/blob/develop/src/commonMain/kotlin/at/florianschuster/store/store.kt) as entry point for more information.
+Go to [store](https://github.com/floschu/store/blob/main/src/commonMain/kotlin/at/florianschuster/store/store.kt) as entry point for more information.
 
 ```kotlin
 class LoginEnvironment(
@@ -94,7 +94,7 @@ class LoginStore(
 )
 ```
 
-A more complex [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/) example can be found in the [example directory](https://github.com/floschu/store/blob/develop/example).
+A more complex [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/) example can be found in the [example directory](https://github.com/floschu/store/blob/main/example).
 
 ## author
 
