@@ -38,7 +38,7 @@ class SearchReducerTest {
     }
 
     @Test
-    fun `when QueryChanged dispatched, then state updates and repository called after debounce`() = runTest {
+    fun `when QueryChanged dispatched - then state updates and repository called after debounce`() = runTest {
         with(Setup(backgroundScope)) {
             sut.dispatch(SearchAction.QueryChanged("test"))
 
@@ -57,7 +57,7 @@ class SearchReducerTest {
     }
 
     @Test
-    fun `when ItemsLoaded dispatched, then items and loading are updated`() = runTest {
+    fun `when ItemsLoaded dispatched - then items and loading are updated`() = runTest {
         with(Setup(backgroundScope)) {
             sut.dispatch(SearchAction.ItemsLoaded(listOf("A", "B")))
 
@@ -67,7 +67,7 @@ class SearchReducerTest {
     }
 
     @Test
-    fun `given pending query, when ResetQuery dispatched, then state resets and effect is cancelled`() =
+    fun `given pending query - when ResetQuery dispatched - then state resets and effect is cancelled`() =
         runTest {
             with(Setup(backgroundScope)) {
                 sut.dispatch(SearchAction.QueryChanged("test"))
