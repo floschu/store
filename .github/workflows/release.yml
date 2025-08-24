@@ -39,7 +39,7 @@ jobs:
       - name: "publish to Maven Central"
         run: |
           cd lib
-          ./gradlew publishAndReleaseToMavenCentral --no-daemon --no-parallel --no-configuration-cache
+          ./gradlew publishToMavenCentral --no-daemon --no-parallel --no-configuration-cache
         env:
           storeVersionTag: ${{ github.ref_name }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}

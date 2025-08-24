@@ -34,8 +34,9 @@ internal class StoreTestJvm {
                     initialState = 0,
                     effectScope = backgroundScope,
                     environment = Unit,
-                    initialEffect = effect { error("error") },
-                    reducer = Reducer { previousState, _ -> previousState },
+                    reducer = Reducer(
+                        initialEffect = effect { error("error") },
+                    ) { previousState, _ -> previousState },
                 )
                 runCurrent()
             }

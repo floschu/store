@@ -51,6 +51,7 @@ public final class at/florianschuster/store/EffectKt {
 }
 
 public abstract interface class at/florianschuster/store/Reducer {
+	public abstract fun getInitialEffect ()Lat/florianschuster/store/Effect;
 	public abstract fun reduce (Lat/florianschuster/store/Reducer$Context;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
@@ -61,7 +62,8 @@ public abstract interface class at/florianschuster/store/Reducer$Context {
 
 public final class at/florianschuster/store/ReducerKt {
 	public static final fun EmptyReducer ()Lat/florianschuster/store/Reducer;
-	public static final fun Reducer (Lkotlin/jvm/functions/Function3;)Lat/florianschuster/store/Reducer;
+	public static final fun Reducer (Lat/florianschuster/store/Effect;Lkotlin/jvm/functions/Function3;)Lat/florianschuster/store/Reducer;
+	public static synthetic fun Reducer$default (Lat/florianschuster/store/Effect;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)Lat/florianschuster/store/Reducer;
 }
 
 public abstract interface class at/florianschuster/store/Store {
@@ -122,10 +124,10 @@ public final class at/florianschuster/store/StoreEvents$Companion {
 }
 
 public final class at/florianschuster/store/StoreKt {
-	public static final fun Store (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Effect;Lat/florianschuster/store/Reducer;Lat/florianschuster/store/StoreEvents;)Lat/florianschuster/store/Store;
-	public static final fun Store (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Effect;Ljava/util/List;Lat/florianschuster/store/StoreEvents;)Lat/florianschuster/store/Store;
-	public static synthetic fun Store$default (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Effect;Lat/florianschuster/store/Reducer;Lat/florianschuster/store/StoreEvents;ILjava/lang/Object;)Lat/florianschuster/store/Store;
-	public static synthetic fun Store$default (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Effect;Ljava/util/List;Lat/florianschuster/store/StoreEvents;ILjava/lang/Object;)Lat/florianschuster/store/Store;
+	public static final fun Store (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Reducer;Lat/florianschuster/store/StoreEvents;)Lat/florianschuster/store/Store;
+	public static final fun Store (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Ljava/util/List;Lat/florianschuster/store/StoreEvents;)Lat/florianschuster/store/Store;
+	public static synthetic fun Store$default (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Lat/florianschuster/store/Reducer;Lat/florianschuster/store/StoreEvents;ILjava/lang/Object;)Lat/florianschuster/store/Store;
+	public static synthetic fun Store$default (Ljava/lang/Object;Ljava/lang/Object;Lkotlinx/coroutines/CoroutineScope;Ljava/util/List;Lat/florianschuster/store/StoreEvents;ILjava/lang/Object;)Lat/florianschuster/store/Store;
 	public static final fun component1 (Lat/florianschuster/store/Store;)Lkotlinx/coroutines/flow/StateFlow;
 	public static final fun component2 (Lat/florianschuster/store/Store;)Lkotlin/jvm/functions/Function1;
 }

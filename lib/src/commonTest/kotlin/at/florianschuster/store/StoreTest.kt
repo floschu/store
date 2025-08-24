@@ -13,13 +13,14 @@ import kotlin.time.Duration.Companion.seconds
 internal class StoreTest {
 
     @Test
-    fun `store initialEffect works as expected`() = runTest {
+    fun `reducer initialEffect is executed`() = runTest {
         val sut: Store<Unit, Int, Int> = Store(
             initialState = 42,
             effectScope = backgroundScope,
             environment = Unit,
-            initialEffect = effect { dispatch(1) },
-            reducer = Reducer { previousState, action -> previousState + action },
+            reducer = Reducer(
+                initialEffect = effect { dispatch(1) },
+            ) { previousState, action -> previousState + action },
         )
         runCurrent()
         assertEquals(43, sut.state.value)

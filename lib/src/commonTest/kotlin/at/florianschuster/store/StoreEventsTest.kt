@@ -45,7 +45,10 @@ class StoreEventsTest {
                     }
                 }
             },
-            events = events::add,
+            events = {
+                events.add(it)
+                println(it)
+            },
         )
 
         sut.dispatch(Action.Start)

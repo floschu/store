@@ -14,7 +14,6 @@ internal class StoreImplementation<Environment, Action, State>(
     initialState: State,
     private val environment: Environment,
     effectScope: CoroutineScope,
-    initialEffect: Effect<Environment, Action>?,
     private val reducer: Reducer<Environment, Action, State>,
     private val events: StoreEvents?,
 ) : Store<Environment, Action, State> {
@@ -25,8 +24,14 @@ internal class StoreImplementation<Environment, Action, State>(
     override val state: StateFlow<State> = _state.asStateFlow()
 
     init {
-        events?.emit(StoreEvent.Initialization(initialState, environment, initialEffect != null))
-        initialEffect?.let { effectHandler.handle(listOf(it)) }
+        events?.emit(
+            StoreEvent.Initialization(
+                initialState = initialState,
+                environment = environment,
+                hasInitialEffect = reducer.initialEffect != null
+            )
+        )
+        reducer.initialEffect?.let { effectHandler.handle(listOf(it)) }
     }
 
     override fun dispatch(action: Action) {
@@ -61,7 +66,6 @@ internal class DelegatingStoreImplementation<Environment, Action, State>(
     initialState: State,
     private val environment: Environment,
     effectScope: CoroutineScope,
-    initialEffect: Effect<Environment, Action>?,
     private val delegates: List<DelegateStore<Environment, Action, State, *, *, *>>,
     private val events: StoreEvents?,
 ) : Store<Environment, Action, State> {
@@ -73,7 +77,7 @@ internal class DelegatingStoreImplementation<Environment, Action, State>(
     override val state: StateFlow<State> = _state.asStateFlow()
 
     init {
-        events?.emit(StoreEvent.Initialization(initialState, environment, initialEffect != null))
+        events?.emit(StoreEvent.Initialization(initialState, environment, false))
         for (delegate in delegates) {
             effectScope.launch {
                 delegate.state.collect { delegateState ->
@@ -98,7 +102,6 @@ internal class DelegatingStoreImplementation<Environment, Action, State>(
                 }
             }
         }
-        initialEffect?.let { effectHandler.handle(listOf(it)) }
     }
 
     override fun dispatch(action: Action) {

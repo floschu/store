@@ -27,8 +27,8 @@ sealed interface StoreEvent {
         val hasInitialEffect: Boolean,
     ) : StoreEvent {
         override fun toString(): String =
-            "init > (initialState = \"$initialState\", " +
-                    "environment = \"$environment\", " +
+            "init > (initialState=\"$initialState\", " +
+                    "environment=\"$environment\", " +
                     "initialEffect=\"$hasInitialEffect\")"
     }
 

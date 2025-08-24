@@ -244,8 +244,9 @@ class DelegateTest {
                     initialState = 42,
                     environment = 1,
                     effectScope = backgroundScope,
-                    initialEffect = effect { dispatch(0) },
-                    reducer = Reducer { previousState, action ->
+                    reducer = Reducer(
+                        initialEffect = effect { dispatch(0) }
+                    ) { previousState, action ->
                         effect(id = "id") {
                             delay(1.seconds)
                             dispatch(1)
