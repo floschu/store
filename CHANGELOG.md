@@ -2,7 +2,7 @@
 
 ## `[0.3.0]` - Not yet released
 
-- Update kotlin to `2.2.10`
+- Update kotlin to `2.2.20`
 
 ## `[0.2.0]` - 2025-08-24
 
