@@ -27,10 +27,7 @@ kotlin {
         }
     }
 
-    jvm("desktop") {
-        compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
-        testRuns["test"].executionTask.configure { useJUnit() }
-    }
+    jvm()
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -65,8 +62,7 @@ kotlin {
             languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
         }
 
-        val desktopMain by getting
-        desktopMain.dependencies {
+        jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
         }
