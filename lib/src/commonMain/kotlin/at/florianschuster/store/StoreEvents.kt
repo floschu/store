@@ -12,6 +12,7 @@ fun interface StoreEvents {
         /**
          * Logs [Store] events via [println].
          */
+        @Suppress("FunctionName") // factory function
         fun Println(tag: String = "store"): StoreEvents = StoreEvents { event -> println("$tag > $event") }
     }
 }
@@ -29,7 +30,7 @@ sealed interface StoreEvent {
         override fun toString(): String =
             "init > (initialState=\"$initialState\", " +
                     "environment=\"$environment\", " +
-                    "initialEffect=\"$hasInitialEffect\")"
+                    "hasInitialEffect=\"$hasInitialEffect\")"
     }
 
     class Dispatch<Action> internal constructor(
@@ -58,18 +59,27 @@ sealed interface StoreEvent {
     }
 
     sealed interface Effect : StoreEvent {
+        val effectId: Any?
+
         class Launch internal constructor(
-            val effectId: Any?,
+            override val effectId: Any?
         ) : Effect {
             override fun toString(): String =
                 "launch > effect" + if (effectId != null) ": \"$effectId\"" else ""
         }
 
-        class Cancel internal constructor(
-            val effectId: Any?,
+        class Complete internal constructor(
+            override val effectId: Any?
         ) : Effect {
             override fun toString(): String =
-                "cancel > effect: \"$effectId\""
+                "complete > effect" + if (effectId != null) ": \"$effectId\"" else ""
+        }
+
+        class Cancel internal constructor(
+            override val effectId: Any?
+        ) : Effect {
+            override fun toString(): String =
+                "cancel > effect" + if (effectId != null) ": \"$effectId\"" else ""
         }
     }
 }

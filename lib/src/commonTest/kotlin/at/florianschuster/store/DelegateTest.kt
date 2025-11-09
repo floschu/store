@@ -1,5 +1,6 @@
 package at.florianschuster.store
 
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -156,7 +157,7 @@ class DelegateTest {
                     expandState = { parentState, _ ->
                         effect(id = "2") {
                             dispatch(12)
-                            suspend { }
+                            awaitCancellation()
                         }
                         parentState
                     },

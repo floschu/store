@@ -7,8 +7,8 @@ plugins {
     alias(libs.plugins.maven.publish) apply true
 }
 
-@OptIn(ExperimentalAbiValidation::class, ExperimentalWasmDsl::class)
 kotlin {
+    @OptIn(ExperimentalAbiValidation::class)
     abiValidation {
         enabled = true
         // work around https://youtrack.jetbrains.com/issue/KT-78525
@@ -53,7 +53,9 @@ kotlin {
     tvosSimulatorArm64()
     tvosX64()
 
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs().nodejs()
+    @OptIn(ExperimentalWasmDsl::class)
     wasmWasi().nodejs()
 
     watchosArm32()
@@ -71,6 +73,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(kotlin("reflect"))
                 implementation(libs.kotlinx.coroutines.test)
             }
             languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")

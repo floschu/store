@@ -1,5 +1,6 @@
 package at.florianschuster.store
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -127,7 +128,7 @@ class EffectHandler<Environment, Action>(
     environment: Environment,
 ) {
     private val executionContext = effectExecutionContext(environment, dispatch)
-    private val executionJobList = ExecutionJobList(events)
+    private val executionJobList = ExecutionJobList(effectScope)
 
     fun handle(effects: List<Effect<Environment, Action>>) {
         effectScope.launch {
@@ -138,16 +139,25 @@ class EffectHandler<Environment, Action>(
                     }
 
                     is EffectExecution<Environment, Action> -> {
-                        // only start if not already started with same id
                         val effectId = effect.id
-                        if (effectId != null && effectId in executionJobList) continue
+                        // only launch effect if it is not already launched
+                        if (effectId != null && executionJobList.isActive(effectId)) {
+                            continue
+                        }
                         // launch new effect
                         val newJob = launch { effect.block(executionContext) }
-                        events?.emit(StoreEvent.Effect.Launch(effect.id))
-                        if (effect.id != null) {
-                            executionJobList.add(
-                                ExecutionJobList.Item(effectId = effect.id, job = newJob),
-                            )
+                        events?.emit(StoreEvent.Effect.Launch(effectId))
+                        newJob.invokeOnCompletion { cause ->
+                            if (cause is CancellationException && effectId != null) {
+                                events?.emit(StoreEvent.Effect.Cancel(effectId))
+                            } else {
+                                events?.emit(StoreEvent.Effect.Complete(effectId))
+                            }
+                        }
+                        // only track job if it has id and has not already completed
+                        if (effectId != null && !newJob.isCompleted) {
+                            val item = ExecutionJobList.JobItem(effectId = effectId, job = newJob)
+                            executionJobList.add(item)
                         }
                     }
                 }
@@ -156,22 +166,28 @@ class EffectHandler<Environment, Action>(
     }
 
     internal class ExecutionJobList(
-        private val events: StoreEvents?,
+        private val effectScope: CoroutineScope
     ) {
 
-        internal class Item(
+        internal class JobItem(
             val effectId: Any?,
             val job: Job,
         )
 
         private val mutex = Mutex()
-        internal val items = mutableListOf<Item>()
+        internal val items = mutableListOf<JobItem>()
 
-        suspend operator fun contains(id: Any): Boolean =
-            mutex.withLock { items.any { it.effectId == id } }
+        suspend fun isActive(id: Any): Boolean = mutex.withLock {
+            val item = items.firstOrNull { it.effectId == id }
+            item != null && item.job.isActive
+        }
 
-        suspend fun add(job: Item) {
-            mutex.withLock { items.add(job) }
+        suspend fun add(jobItem: JobItem) {
+            suspend fun remove() = mutex.withLock { items.remove(jobItem) }
+            mutex.withLock {
+                items.add(jobItem)
+                jobItem.job.invokeOnCompletion { effectScope.launch { remove() } }
+            }
         }
 
         suspend fun cancel(ids: List<Any>) {
@@ -179,10 +195,11 @@ class EffectHandler<Environment, Action>(
             mutex.withLock {
                 if (items.isEmpty()) return@withLock
                 for (id in ids) {
-                    val job = items.firstOrNull { it.effectId == id } ?: continue
-                    job.job.cancel()
-                    events?.emit(StoreEvent.Effect.Cancel(job.effectId))
-                    items.remove(job)
+                    val jobItem = items
+                        .firstOrNull { it.effectId == id }
+                        ?: continue
+                    jobItem.job.cancel()
+                    items.remove(jobItem)
                 }
             }
         }

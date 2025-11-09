@@ -73,11 +73,21 @@ sealed interface <#A: kotlin/Any?, #B: kotlin/Any?> at.florianschuster.store/Eff
 
 sealed interface at.florianschuster.store/StoreEvent { // at.florianschuster.store/StoreEvent|null[0]
     sealed interface Effect : at.florianschuster.store/StoreEvent { // at.florianschuster.store/StoreEvent.Effect|null[0]
+        abstract val effectId // at.florianschuster.store/StoreEvent.Effect.effectId|{}effectId[0]
+            abstract fun <get-effectId>(): kotlin/Any? // at.florianschuster.store/StoreEvent.Effect.effectId.<get-effectId>|<get-effectId>(){}[0]
+
         final class Cancel : at.florianschuster.store/StoreEvent.Effect { // at.florianschuster.store/StoreEvent.Effect.Cancel|null[0]
             final val effectId // at.florianschuster.store/StoreEvent.Effect.Cancel.effectId|{}effectId[0]
                 final fun <get-effectId>(): kotlin/Any? // at.florianschuster.store/StoreEvent.Effect.Cancel.effectId.<get-effectId>|<get-effectId>(){}[0]
 
             final fun toString(): kotlin/String // at.florianschuster.store/StoreEvent.Effect.Cancel.toString|toString(){}[0]
+        }
+
+        final class Complete : at.florianschuster.store/StoreEvent.Effect { // at.florianschuster.store/StoreEvent.Effect.Complete|null[0]
+            final val effectId // at.florianschuster.store/StoreEvent.Effect.Complete.effectId|{}effectId[0]
+                final fun <get-effectId>(): kotlin/Any? // at.florianschuster.store/StoreEvent.Effect.Complete.effectId.<get-effectId>|<get-effectId>(){}[0]
+
+            final fun toString(): kotlin/String // at.florianschuster.store/StoreEvent.Effect.Complete.toString|toString(){}[0]
         }
 
         final class Launch : at.florianschuster.store/StoreEvent.Effect { // at.florianschuster.store/StoreEvent.Effect.Launch|null[0]

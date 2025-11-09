@@ -1,5 +1,7 @@
 package at.florianschuster.store
 
+import at.florianschuster.store.EffectExecution.Context
+
 /**
  * An [Effect] represents a side effect that can be executed in the context of a [Reducer].
  * The [Effect] is executed right after the [Reducer] has processed an action.
@@ -46,6 +48,11 @@ interface EffectCancellation<Environment, Action> : Effect<Environment, Action> 
 
 /**
  * Creates an [EffectExecution].
+ *
+ * @param id An optional identifier for the [Effect]. If an [Effect] has an [id], it can not be executed again
+ * until [block] has completed or the [Effect] was cancelled via [EffectCancellation].
+ * @param block The suspending block of code to be executed. It has access to [Context] which provides the
+ * [Environment] and a way to dispatch actions.
  */
 fun <Environment, Action> effect(
     id: Any? = null,
@@ -57,6 +64,11 @@ fun <Environment, Action> effect(
 
 /**
  * Creates and adds an [EffectExecution] in the context of a [Reducer.reduce].
+ *
+ * @param id An optional identifier for the [Effect]. If an [Effect] has an [id], it can not be executed again
+ * until [block] has completed or the [Effect] was cancelled via [EffectCancellation].
+ * @param block The suspending block of code to be executed. It has access to [Context] which provides the
+ * [Environment] and a way to dispatch actions.
  */
 fun <Environment, Action> Reducer.Context<Environment, Action>.effect(
     id: Any? = null,
@@ -71,6 +83,11 @@ fun <Environment, Action> Reducer.Context<Environment, Action>.effect(
 
 /**
  * Creates and adds an [EffectExecution] in the context of a [DelegateStore.expandState].
+ *
+ * @param id An optional identifier for the [Effect]. If an [Effect] has an [id], it can not be executed again
+ * until [block] has completed or the [Effect] was cancelled via [EffectCancellation].
+ * @param block The suspending block of code to be executed. It has access to [Context] which provides the
+ * [Environment] and a way to dispatch actions.
  */
 fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.effect(
     id: Any? = null,
@@ -85,6 +102,8 @@ fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.
 
 /**
  * Creates and adds an [EffectCancellation] in the context of a [Reducer.reduce].
+ *
+ * @param ids A list of IDs of the [Effect]s to be cancelled.
  */
 fun <Environment, Action> Reducer.Context<Environment, Action>.cancelEffect(
     id: Any,
@@ -97,6 +116,8 @@ fun <Environment, Action> Reducer.Context<Environment, Action>.cancelEffect(
 
 /**
  * Creates and adds an [EffectCancellation] in the context of a [DelegateStore.expandState].
+ *
+ * @param ids A list of IDs of the [Effect]s to be cancelled.
  */
 fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.cancelEffect(
     id: Any,
@@ -109,6 +130,8 @@ fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.
 
 /**
  * Creates and adds an [EffectCancellation] in the context of a [Reducer.reduce].
+ *
+ * @param ids A list of IDs of the [Effect]s to be cancelled.
  */
 fun <Environment, Action> Reducer.Context<Environment, Action>.cancelEffects(
     ids: List<Any>,
@@ -121,6 +144,8 @@ fun <Environment, Action> Reducer.Context<Environment, Action>.cancelEffects(
 
 /**
  * Creates and adds an [EffectCancellation] in the context of a [DelegateStore.expandState].
+ *
+ * @param ids A list of IDs of the [Effect]s to be cancelled.
  */
 fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.cancelEffects(
     ids: List<Any>,

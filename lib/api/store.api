@@ -80,15 +80,21 @@ public final class at/florianschuster/store/StoreEvent$Dispatch : at/florianschu
 }
 
 public abstract interface class at/florianschuster/store/StoreEvent$Effect : at/florianschuster/store/StoreEvent {
+	public abstract fun getEffectId ()Ljava/lang/Object;
 }
 
 public final class at/florianschuster/store/StoreEvent$Effect$Cancel : at/florianschuster/store/StoreEvent$Effect {
-	public final fun getEffectId ()Ljava/lang/Object;
+	public fun getEffectId ()Ljava/lang/Object;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class at/florianschuster/store/StoreEvent$Effect$Complete : at/florianschuster/store/StoreEvent$Effect {
+	public fun getEffectId ()Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class at/florianschuster/store/StoreEvent$Effect$Launch : at/florianschuster/store/StoreEvent$Effect {
-	public final fun getEffectId ()Ljava/lang/Object;
+	public fun getEffectId ()Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
 }
 

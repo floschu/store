@@ -1,12 +1,16 @@
 package at.florianschuster.store
 
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.milliseconds
 
 class StoreEventsTest {
@@ -16,6 +20,8 @@ class StoreEventsTest {
     @Test
     fun `events are emitted by Store`() = runTest {
         val events = mutableListOf<StoreEvent>()
+        fun effectEvents() = events.filterIsInstance<StoreEvent.Effect>()
+        fun nonEffectEvents() = events.filterNot { it is StoreEvent.Effect }
         val sut: Store<Unit, Action, Int> = Store(
             initialState = 0,
             effectScope = backgroundScope,
@@ -23,7 +29,8 @@ class StoreEventsTest {
             reducer = Reducer { previousState, action ->
                 when (action) {
                     Action.Start -> {
-                        effect("effect_start") {
+                        effect { awaitCancellation() }
+                        effect(Action.Start) {
                             delay(100)
                             dispatch(Action.Add)
                         }
@@ -31,7 +38,7 @@ class StoreEventsTest {
                     }
 
                     Action.Add -> {
-                        effect("effect_add") {
+                        effect(Action.Add) {
                             delay(200)
                             dispatch(Action.Cancel)
                         }
@@ -39,8 +46,8 @@ class StoreEventsTest {
                     }
 
                     Action.Cancel -> {
-                        effect(id = "effect_cancel") { }
-                        cancelEffect(id = "effect_cancel")
+                        effect(id = Action.Cancel) { }
+                        cancelEffect(id = Action.Cancel)
                         previousState
                     }
                 }
@@ -52,66 +59,81 @@ class StoreEventsTest {
         )
 
         sut.dispatch(Action.Start)
+        advanceUntilIdle()
 
-        with(events[0]) {
+        with(nonEffectEvents()[0]) {
             assertIs<StoreEvent.Initialization<Int, Unit>>(this)
             assertEquals(0, initialState)
             assertEquals(Unit, environment)
             assertFalse(hasInitialEffect)
         }
-        with(events[1]) {
+        with(nonEffectEvents()[1]) {
             assertIs<StoreEvent.Dispatch<Action>>(this)
             assertEquals(Action.Start, action)
         }
-        with(events[2]) {
+        with(nonEffectEvents()[2]) {
             assertIs<StoreEvent.Reduce<Action, Int>>(this)
             assertEquals(0, previousState)
             assertEquals(Action.Start, action)
             assertEquals(0, newState)
         }
-
-        advanceTimeBy(101.milliseconds)
-        with(events[3]) {
+        runCurrent()
+        with(effectEvents()[0]) {
             assertIs<StoreEvent.Effect.Launch>(this)
-            assertEquals("effect_start", effectId)
+            assertNull(effectId)
         }
-        with(events[4]) {
+        with(effectEvents()[1]) {
+            assertIs<StoreEvent.Effect.Launch>(this)
+            assertEquals(Action.Start, effectId)
+        }
+        advanceTimeBy(101.milliseconds)
+        with(effectEvents()[2]) {
+            assertIs<StoreEvent.Effect.Complete>(this)
+            assertEquals(Action.Start, effectId)
+        }
+
+        with(nonEffectEvents()[3]) {
             assertIs<StoreEvent.Dispatch<Action>>(this)
             assertEquals(Action.Add, action)
         }
-        with(events[5]) {
+        with(nonEffectEvents()[4]) {
             assertIs<StoreEvent.Reduce<Action, Int>>(this)
             assertEquals(0, previousState)
             assertEquals(Action.Add, action)
             assertEquals(1, newState)
         }
-
-        advanceTimeBy(200.milliseconds)
-        with(events[6]) {
+        runCurrent()
+        with(effectEvents()[3]) {
             assertIs<StoreEvent.Effect.Launch>(this)
-            assertEquals("effect_add", effectId)
+            assertEquals(Action.Add, effectId)
         }
-        with(events[7]) {
+        advanceTimeBy(200.milliseconds)
+        with(effectEvents()[4]) {
+            assertIs<StoreEvent.Effect.Complete>(this)
+            assertEquals(Action.Add, effectId)
+        }
+
+        with(nonEffectEvents()[5]) {
             assertIs<StoreEvent.Dispatch<Action>>(this)
             assertEquals(Action.Cancel, action)
         }
-        with(events[8]) {
+        with(nonEffectEvents()[6]) {
             assertIs<StoreEvent.Reduce<Action, Int>>(this)
             assertEquals(1, previousState)
             assertEquals(Action.Cancel, action)
             assertEquals(1, newState)
         }
-
-        with(events[9]) {
+        with(effectEvents()[5]) {
             assertIs<StoreEvent.Effect.Launch>(this)
-            assertEquals("effect_cancel", effectId)
+            assertEquals(Action.Cancel, effectId)
         }
-
-        with(events[10]) {
+        with(effectEvents()[6]) {
             assertIs<StoreEvent.Effect.Cancel>(this)
-            assertEquals("effect_cancel", effectId)
+            assertEquals(Action.Cancel, effectId)
         }
 
-        assertEquals(11, events.count())
+        assertEquals(7, nonEffectEvents().count())
+        assertEquals(7, effectEvents().count())
+        assertEquals(14, events.count())
     }
 }
