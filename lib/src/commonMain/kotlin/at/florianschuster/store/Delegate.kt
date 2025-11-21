@@ -11,9 +11,9 @@ interface DelegateStore<DelegatingEnvironment, DelegatingAction, DelegatingState
     /**
      * The context in which [expandState] is executed.
      */
-    interface ExpandStateContext<Environment, Action> {
+    interface ExpandStateContext<Environment, Action, State> {
         val environment: Environment
-        fun add(effect: Effect<Environment, Action>)
+        fun add(effect: Effect<Environment, Action, State>)
     }
 
     val state: StateFlow<DelegateState>
@@ -22,7 +22,7 @@ interface DelegateStore<DelegatingEnvironment, DelegatingAction, DelegatingState
     /**
      * Reduces the [DelegatingState] based on the [DelegateState].
      */
-    fun ExpandStateContext<DelegatingEnvironment, DelegatingAction>.expandState(
+    fun ExpandStateContext<DelegatingEnvironment, DelegatingAction, DelegatingState>.expandState(
         state: DelegatingState,
         delegateState: DelegateState
     ): DelegatingState
@@ -39,7 +39,7 @@ interface DelegateStore<DelegatingEnvironment, DelegatingAction, DelegatingState
 fun <DelegatingEnvironment, DelegatingAction, DelegatingState, DelegateEnvironment, DelegateAction, DelegateState>
         Store<DelegateEnvironment, DelegateAction, DelegateState>.delegate(
     scopeAction: (DelegatingAction) -> DelegateAction?,
-    expandState: DelegateStore.ExpandStateContext<DelegatingEnvironment, DelegatingAction>.(
+    expandState: DelegateStore.ExpandStateContext<DelegatingEnvironment, DelegatingAction, DelegatingState>.(
         state: DelegatingState,
         delegateState: DelegateState
     ) -> DelegatingState,
@@ -68,7 +68,7 @@ fun <DelegatingEnvironment, DelegatingAction, DelegatingState, DelegateEnvironme
     environment: DelegateEnvironment,
     effectScope: CoroutineScope,
     scopeAction: (DelegatingAction) -> DelegateAction?,
-    expandState: DelegateStore.ExpandStateContext<DelegatingEnvironment, DelegatingAction>.(
+    expandState: DelegateStore.ExpandStateContext<DelegatingEnvironment, DelegatingAction, DelegatingState>.(
         state: DelegatingState,
         delegateState: DelegateState
     ) -> DelegatingState,
@@ -110,7 +110,7 @@ private class DelegateStoreImplementation<DelegatingEnvironment, DelegatingActio
         DelegateEnvironment, DelegateAction, DelegateState>(
     private val delegate: Store<DelegateEnvironment, DelegateAction, DelegateState>,
     private val localScopeAction: (DelegatingAction) -> DelegateAction?,
-    private val localExpandState: DelegateStore.ExpandStateContext<DelegatingEnvironment, DelegatingAction>.(
+    private val localExpandState: DelegateStore.ExpandStateContext<DelegatingEnvironment, DelegatingAction, DelegatingState>.(
         state: DelegatingState,
         delegateState: DelegateState
     ) -> DelegatingState,
@@ -124,7 +124,7 @@ private class DelegateStoreImplementation<DelegatingEnvironment, DelegatingActio
         delegate.dispatch(scopedAction)
     }
 
-    override fun DelegateStore.ExpandStateContext<DelegatingEnvironment, DelegatingAction>.expandState(
+    override fun DelegateStore.ExpandStateContext<DelegatingEnvironment, DelegatingAction, DelegatingState>.expandState(
         state: DelegatingState,
         delegateState: DelegateState,
     ): DelegatingState = localExpandState(state, delegateState)

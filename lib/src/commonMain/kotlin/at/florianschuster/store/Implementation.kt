@@ -19,10 +19,17 @@ internal class StoreImplementation<Environment, Action, State>(
     private val events: StoreEvents?,
 ) : Store<Environment, Action, State> {
 
-    private val effectHandler = EffectHandler(::dispatch, effectScope, events, environment)
     private val _state = MutableStateFlow(initialState)
-
     override val state: StateFlow<State> = _state.asStateFlow()
+
+    private val effectHandler = EffectHandler(
+        state = state,
+        dispatch = ::dispatch,
+        effectScope = effectScope,
+        events = events,
+        environment = environment
+    )
+
 
     init {
         events?.emit(
@@ -37,7 +44,7 @@ internal class StoreImplementation<Environment, Action, State>(
 
     override fun dispatch(action: Action) {
         events?.emit(StoreEvent.Dispatch(action))
-        val effects = mutableListOf<Effect<Environment, Action>>()
+        val effects = mutableListOf<Effect<Environment, Action, State>>()
         val reducerContext = reducerContext(
             environment = environment,
             addEffect = { effects += it },
@@ -54,12 +61,12 @@ internal class StoreImplementation<Environment, Action, State>(
         effectHandler.handle(effects)
     }
 
-    private fun <Environment, Action> reducerContext(
+    private fun <Environment, Action, State> reducerContext(
         environment: Environment,
-        addEffect: (Effect<Environment, Action>) -> Unit,
-    ) = object : Reducer.Context<Environment, Action> {
+        addEffect: (Effect<Environment, Action, State>) -> Unit,
+    ) = object : Reducer.Context<Environment, Action, State> {
         override val environment: Environment = environment
-        override fun add(effect: Effect<Environment, Action>) = addEffect(effect)
+        override fun add(effect: Effect<Environment, Action, State>) = addEffect(effect)
     }
 }
 
@@ -72,10 +79,17 @@ internal class DelegatingStoreImplementation<Environment, Action, State>(
 ) : Store<Environment, Action, State> {
 
     private val stateMutex = Mutex()
-    private val effectHandler = EffectHandler(::dispatch, effectScope, events, environment)
     private val _state = MutableStateFlow(initialState)
-
     override val state: StateFlow<State> = _state.asStateFlow()
+
+    private val effectHandler = EffectHandler(
+        state = state,
+        dispatch = ::dispatch,
+        effectScope = effectScope,
+        events = events,
+        environment = environment
+    )
+
 
     init {
         events?.emit(StoreEvent.Initialization(initialState, environment, false))
@@ -83,7 +97,7 @@ internal class DelegatingStoreImplementation<Environment, Action, State>(
             effectScope.launch {
                 delegate.state.collect { delegateState ->
                     stateMutex.withLock {
-                        val effects = mutableListOf<Effect<Environment, Action>>()
+                        val effects = mutableListOf<Effect<Environment, Action, State>>()
                         val expandStateContext = expandStateContext(
                             environment = environment,
                             addEffect = { effects += it },
@@ -112,33 +126,34 @@ internal class DelegatingStoreImplementation<Environment, Action, State>(
         }
     }
 
-    private fun <Environment, Action> expandStateContext(
+    private fun <Environment, Action, State> expandStateContext(
         environment: Environment,
-        addEffect: (Effect<Environment, Action>) -> Unit,
-    ) = object : DelegateStore.ExpandStateContext<Environment, Action> {
+        addEffect: (Effect<Environment, Action, State>) -> Unit,
+    ) = object : DelegateStore.ExpandStateContext<Environment, Action, State> {
         override val environment: Environment = environment
-        override fun add(effect: Effect<Environment, Action>) = addEffect(effect)
+        override fun add(effect: Effect<Environment, Action, State>) = addEffect(effect)
     }
 }
 
-class EffectHandler<Environment, Action>(
+internal class EffectHandler<Environment, Action, State>(
+    state: StateFlow<State>,
     dispatch: (Action) -> Unit,
     private val effectScope: CoroutineScope,
     private val events: StoreEvents?,
     environment: Environment,
 ) {
-    private val executionContext = effectExecutionContext(environment, dispatch)
+    private val executionContext = effectExecutionContext(environment, state, dispatch)
     private val executionJobList = ExecutionJobList(effectScope)
 
-    fun handle(effects: List<Effect<Environment, Action>>) {
+    fun handle(effects: List<Effect<Environment, Action, State>>) {
         effectScope.launch {
             for (effect in effects) {
                 when (effect) {
-                    is EffectCancellation<Environment, Action> -> {
+                    is EffectCancellation<Environment, Action, State> -> {
                         executionJobList.cancel(effect.ids)
                     }
 
-                    is EffectExecution<Environment, Action> -> {
+                    is EffectExecution<Environment, Action, State> -> {
                         val effectId = effect.id
                         // only launch effect if it is not already launched
                         if (effectId != null && executionJobList.isActive(effectId)) {
@@ -205,11 +220,13 @@ class EffectHandler<Environment, Action>(
         }
     }
 
-    private fun <Environment, Action> effectExecutionContext(
+    private fun <Environment, Action, State> effectExecutionContext(
         environment: Environment,
+        state: StateFlow<State>,
         dispatch: (Action) -> Unit,
-    ) = object : EffectExecution.Context<Environment, Action> {
+    ) = object : EffectExecution.Context<Environment, Action, State> {
         override val environment: Environment = environment
+        override val state: StateFlow<State> = state
         override fun dispatch(action: Action) = dispatch(action)
     }
 }

@@ -9,27 +9,27 @@ internal class EffectTest {
 
     @Test
     fun `effect factory function`() {
-        val effects = mutableListOf<Effect<Int, Int>>()
+        val effects = mutableListOf<Effect<Int, Int, Unit>>()
         effects.add(effect {})
         effects.add(effect(1) {})
 
         assertEquals(2, effects.count())
         with(effects[0]) {
-            assertIs<EffectExecution<Int, Int>>(this)
+            assertIs<EffectExecution<Int, Int, Unit>>(this)
             assertNull(id)
         }
         with(effects[1]) {
-            assertIs<EffectExecution<Int, Int>>(this)
+            assertIs<EffectExecution<Int, Int, Unit>>(this)
             assertEquals(1, id)
         }
     }
 
     @Test
     fun `effect on Reducer Context`() {
-        val effects = mutableListOf<Effect<Int, Int>>()
-        val context = object : Reducer.Context<Int, Int> {
+        val effects = mutableListOf<Effect<Int, Int, Unit>>()
+        val context = object : Reducer.Context<Int, Int, Unit> {
             override val environment: Int = 42
-            override fun add(effect: Effect<Int, Int>) {
+            override fun add(effect: Effect<Int, Int, Unit>) {
                 effects.add(effect)
             }
         }
@@ -39,21 +39,21 @@ internal class EffectTest {
 
         assertEquals(2, effects.count())
         with(effects[0]) {
-            assertIs<EffectExecution<Int, Int>>(this)
+            assertIs<EffectExecution<Int, Int, Unit>>(this)
             assertNull(id)
         }
         with(effects[1]) {
-            assertIs<EffectExecution<Int, Int>>(this)
+            assertIs<EffectExecution<Int, Int, Unit>>(this)
             assertEquals(1, id)
         }
     }
 
     @Test
     fun `cancelEffect on Reducer Context`() {
-        val effects = mutableListOf<Effect<Int, Int>>()
-        val context = object : Reducer.Context<Int, Int> {
+        val effects = mutableListOf<Effect<Int, Int, Unit>>()
+        val context = object : Reducer.Context<Int, Int, Unit> {
             override val environment: Int = 42
-            override fun add(effect: Effect<Int, Int>) {
+            override fun add(effect: Effect<Int, Int, Unit>) {
                 effects.add(effect)
             }
         }
@@ -63,21 +63,21 @@ internal class EffectTest {
 
         assertEquals(2, effects.count())
         with(effects[0]) {
-            assertIs<EffectCancellation<Int, Int>>(this)
+            assertIs<EffectCancellation<Int, Int, Unit>>(this)
             assertEquals(listOf(1), ids)
         }
         with(effects[1]) {
-            assertIs<EffectCancellation<Int, Int>>(this)
+            assertIs<EffectCancellation<Int, Int, Unit>>(this)
             assertEquals(listOf(2, 3), ids)
         }
     }
 
     @Test
     fun `effect on ExpandState Context`() {
-        val effects = mutableListOf<Effect<Int, Int>>()
-        val context = object : DelegateStore.ExpandStateContext<Int, Int> {
+        val effects = mutableListOf<Effect<Int, Int, Unit>>()
+        val context = object : DelegateStore.ExpandStateContext<Int, Int, Unit> {
             override val environment: Int = 42
-            override fun add(effect: Effect<Int, Int>) {
+            override fun add(effect: Effect<Int, Int, Unit>) {
                 effects.add(effect)
             }
         }
@@ -87,21 +87,21 @@ internal class EffectTest {
 
         assertEquals(2, effects.count())
         with(effects[0]) {
-            assertIs<EffectExecution<Int, Int>>(this)
+            assertIs<EffectExecution<Int, Int, Unit>>(this)
             assertNull(id)
         }
         with(effects[1]) {
-            assertIs<EffectExecution<Int, Int>>(this)
+            assertIs<EffectExecution<Int, Int, Unit>>(this)
             assertEquals(1, id)
         }
     }
 
     @Test
     fun `cancelEffect on ExpandState Context`() {
-        val effects = mutableListOf<Effect<Int, Int>>()
-        val context = object : DelegateStore.ExpandStateContext<Int, Int> {
+        val effects = mutableListOf<Effect<Int, Int, Unit>>()
+        val context = object : DelegateStore.ExpandStateContext<Int, Int, Unit> {
             override val environment: Int = 42
-            override fun add(effect: Effect<Int, Int>) {
+            override fun add(effect: Effect<Int, Int, Unit>) {
                 effects.add(effect)
             }
         }
@@ -111,11 +111,11 @@ internal class EffectTest {
 
         assertEquals(2, effects.count())
         with(effects[0]) {
-            assertIs<EffectCancellation<Int, Int>>(this)
+            assertIs<EffectCancellation<Int, Int, Unit>>(this)
             assertEquals(listOf(1), ids)
         }
         with(effects[1]) {
-            assertIs<EffectCancellation<Int, Int>>(this)
+            assertIs<EffectCancellation<Int, Int, Unit>>(this)
             assertEquals(listOf(2, 3), ids)
         }
     }

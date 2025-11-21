@@ -8,9 +8,9 @@ internal class ReducerTest {
 
     @Test
     fun `Reducer factory function`() {
-        val context = object : Reducer.Context<Int, Int> {
+        val context = object : Reducer.Context<Int, Int, Int> {
             override val environment: Int = 42
-            override fun add(effect: Effect<Int, Int>) = error("not implemented")
+            override fun add(effect: Effect<Int, Int, Int>) = error("not implemented")
         }
         val reducer: Reducer<Int, Int, Int> = Reducer { previousState, _ ->
             previousState + 420
@@ -25,11 +25,11 @@ internal class ReducerTest {
 
     @Test
     fun `Reducer factory function with initialEffect`() {
-        val context = object : Reducer.Context<Int, Int> {
+        val context = object : Reducer.Context<Int, Int, Int> {
             override val environment: Int = 42
-            override fun add(effect: Effect<Int, Int>) = error("not implemented")
+            override fun add(effect: Effect<Int, Int, Int>) = error("not implemented")
         }
-        val initialEffect = effect<Int, Int> { }
+        val initialEffect = effect<Int, Int, Int> { }
         val reducer: Reducer<Int, Int, Int> = Reducer(initialEffect) { previousState, _ ->
             previousState + 420
         }
@@ -43,9 +43,9 @@ internal class ReducerTest {
 
     @Test
     fun `EmptyReducer factory function`() {
-        val context = object : Reducer.Context<Int, Int> {
+        val context = object : Reducer.Context<Int, Int, Int> {
             override val environment: Int = 42
-            override fun add(effect: Effect<Int, Int>) = error("not implemented")
+            override fun add(effect: Effect<Int, Int, Int>) = error("not implemented")
         }
         val reducer: Reducer<Int, Int, Int> = EmptyReducer()
         with(context) {

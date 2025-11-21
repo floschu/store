@@ -1,6 +1,7 @@
 package at.florianschuster.store
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -50,7 +51,7 @@ internal class StoreTest {
     private enum class AddAction { Start, Add, Different }
 
     @Test
-    fun `store  effects work as expected`() = runTest {
+    fun `store effects work as expected`() = runTest {
         val injectedEnvironment = "something"
         val sut: Store<String, AddAction, Int> = Store(
             initialState = 0,
@@ -169,6 +170,37 @@ internal class StoreTest {
         advanceTimeBy(500 + 1)
         sut.dispatch(Unit)
         advanceTimeBy(1_000 + 1)
+        assertEquals(5, sut.state.value)
+    }
+
+    @Test
+    fun `effect state works as expected`() = runTest {
+        val effectDelay = 100.milliseconds
+        val sut: Store<Unit, Unit, Int> = Store(
+            initialState = 0,
+            environment = Unit,
+            effectScope = backgroundScope,
+            reducer = Reducer { previousState, _ ->
+                effect("effect_state") {
+                    state.takeWhile { it < 5 }.collect {
+                        delay(effectDelay)
+                        dispatch(Unit)
+                    }
+                }
+                previousState + 1
+            },
+            events = StoreEvents.Println(),
+        )
+
+        sut.dispatch(Unit)
+        assertEquals(1, sut.state.value)
+        advanceTimeBy(effectDelay + 1.milliseconds)
+        assertEquals(2, sut.state.value)
+        advanceTimeBy(effectDelay)
+        assertEquals(3, sut.state.value)
+        advanceTimeBy(effectDelay)
+        assertEquals(4, sut.state.value)
+        advanceTimeBy(effectDelay)
         assertEquals(5, sut.state.value)
     }
 

@@ -8,15 +8,15 @@ interface Reducer<Environment, Action, State> {
     /**
      * The context in which [Reducer.reduce] is executed.
      */
-    interface Context<Environment, Action> {
+    interface Context<Environment, Action, State> {
         val environment: Environment
-        fun add(effect: Effect<Environment, Action>)
+        fun add(effect: Effect<Environment, Action, State>)
     }
 
     /**
      * An optional [Effect] that is executed when the [Reducer] is initialized.
      */
-    val initialEffect: Effect<Environment, Action>?
+    val initialEffect: Effect<Environment, Action, State>?
 
     /**
      * Reduces the [previousState] based on the [action] and returns a new [State].
@@ -31,7 +31,7 @@ interface Reducer<Environment, Action, State> {
      * @param action The [Action] that was dispatched.
      * @return The new [State] after processing the [action].
      */
-    fun Context<Environment, Action>.reduce(
+    fun Context<Environment, Action, State>.reduce(
         previousState: State,
         action: Action,
     ): State
@@ -41,12 +41,15 @@ interface Reducer<Environment, Action, State> {
  * Creates a [Reducer].
  */
 fun <Environment, Action, State> Reducer(
-    initialEffect: Effect<Environment, Action>? = null,
-    reduce: Reducer.Context<Environment, Action>.(
+    initialEffect: Effect<Environment, Action, State>? = null,
+    reduce: Reducer.Context<Environment, Action, State>.(
         previousState: State,
         action: Action,
     ) -> State,
-): Reducer<Environment, Action, State> = StoreReducer(initialEffect = initialEffect, reduce = reduce)
+): Reducer<Environment, Action, State> = StoreReducer(
+    initialEffect = initialEffect,
+    reduce = reduce
+)
 
 /**
  * Creates an empty [Reducer] that does not change the state.
@@ -54,21 +57,21 @@ fun <Environment, Action, State> Reducer(
 @Suppress("FunctionName")
 fun <Environment, Action, State> EmptyReducer(): Reducer<Environment, Action, State> =
     object : Reducer<Environment, Action, State> {
-        override val initialEffect: Effect<Environment, Action>? = null
-        override fun Reducer.Context<Environment, Action>.reduce(
+        override val initialEffect: Effect<Environment, Action, State>? = null
+        override fun Reducer.Context<Environment, Action, State>.reduce(
             previousState: State,
             action: Action,
         ): State = previousState
     }
 
 internal class StoreReducer<Environment, Action, State>(
-    override val initialEffect: Effect<Environment, Action>?,
-    private val reduce: Reducer.Context<Environment, Action>.(
+    override val initialEffect: Effect<Environment, Action, State>?,
+    private val reduce: Reducer.Context<Environment, Action, State>.(
         previousState: State,
         action: Action,
     ) -> State,
 ) : Reducer<Environment, Action, State> {
-    override fun Reducer.Context<Environment, Action>.reduce(
+    override fun Reducer.Context<Environment, Action, State>.reduce(
         previousState: State,
         action: Action,
     ): State = this@StoreReducer.reduce(this, previousState, action)

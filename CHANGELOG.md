@@ -1,5 +1,9 @@
 # changelog
 
+## `[0.4.0]` - 2025-11-21
+
+- Add `val state: StateFlow<State>` to `EffectExecution.Context`
+
 ## `[0.3.0]` - 2025-11-09
 
 - Update kotlin to `2.2.21`

@@ -1,6 +1,7 @@
 package at.florianschuster.store
 
 import at.florianschuster.store.EffectExecution.Context
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * An [Effect] represents a side effect that can be executed in the context of a [Reducer].
@@ -10,7 +11,7 @@ import at.florianschuster.store.EffectExecution.Context
  *  * [EffectExecution] via [effect]
  *  * [EffectCancellation] via [cancelEffect]/[cancelEffects]
  */
-sealed interface Effect<Environment, Action>
+sealed interface Effect<Environment, Action, State>
 
 /**
  * An [Effect] that executes a block of code.
@@ -20,17 +21,18 @@ sealed interface Effect<Environment, Action>
  * @param id An optional identifier for the [Effect]. If an [Effect] has an [id], it can not be executed again
  * until [block] has completed or the [Effect] was cancelled via [EffectCancellation].
  * @param block The suspending block of code to be executed. It has access to [Context] which provides the
- * [Environment] and a way to dispatch actions.
+ * [Environment], [State] and a way to dispatch [Action]s.
  */
-interface EffectExecution<Environment, Action> : Effect<Environment, Action> {
+interface EffectExecution<Environment, Action, State> : Effect<Environment, Action, State> {
     val id: Any?
-    val block: (suspend Context<Environment, Action>.() -> Unit)
+    val block: suspend Context<Environment, Action, State>.() -> Unit
 
     /**
      * The context in which [EffectExecution.block] is executed.
      */
-    interface Context<Environment, Action> {
+    interface Context<Environment, Action, State> {
         val environment: Environment
+        val state: StateFlow<State>
         fun dispatch(action: Action)
     }
 }
@@ -42,7 +44,7 @@ interface EffectExecution<Environment, Action> : Effect<Environment, Action> {
  *
  * @param ids A list of IDs of the [Effect]s to be cancelled.
  */
-interface EffectCancellation<Environment, Action> : Effect<Environment, Action> {
+interface EffectCancellation<Environment, Action, State> : Effect<Environment, Action, State> {
     val ids: List<Any>
 }
 
@@ -54,12 +56,12 @@ interface EffectCancellation<Environment, Action> : Effect<Environment, Action> 
  * @param block The suspending block of code to be executed. It has access to [Context] which provides the
  * [Environment] and a way to dispatch actions.
  */
-fun <Environment, Action> effect(
+fun <Environment, Action, State> effect(
     id: Any? = null,
-    block: suspend EffectExecution.Context<Environment, Action>.() -> Unit,
-) = object : EffectExecution<Environment, Action> {
+    block: suspend Context<Environment, Action, State>.() -> Unit,
+): EffectExecution<Environment, Action, State> = object : EffectExecution<Environment, Action, State> {
     override val id: Any? = id
-    override val block: suspend EffectExecution.Context<Environment, Action>.() -> Unit = block
+    override val block: suspend Context<Environment, Action, State>.() -> Unit = block
 }
 
 /**
@@ -70,13 +72,13 @@ fun <Environment, Action> effect(
  * @param block The suspending block of code to be executed. It has access to [Context] which provides the
  * [Environment] and a way to dispatch actions.
  */
-fun <Environment, Action> Reducer.Context<Environment, Action>.effect(
+fun <Environment, Action, State> Reducer.Context<Environment, Action, State>.effect(
     id: Any? = null,
-    block: suspend EffectExecution.Context<Environment, Action>.() -> Unit,
+    block: suspend Context<Environment, Action, State>.() -> Unit,
 ) {
-    val effect = object : EffectExecution<Environment, Action> {
+    val effect = object : EffectExecution<Environment, Action, State> {
         override val id: Any? = id
-        override val block: suspend EffectExecution.Context<Environment, Action>.() -> Unit = block
+        override val block: suspend Context<Environment, Action, State>.() -> Unit = block
     }
     add(effect)
 }
@@ -89,13 +91,13 @@ fun <Environment, Action> Reducer.Context<Environment, Action>.effect(
  * @param block The suspending block of code to be executed. It has access to [Context] which provides the
  * [Environment] and a way to dispatch actions.
  */
-fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.effect(
+fun <Environment, Action, State> DelegateStore.ExpandStateContext<Environment, Action, State>.effect(
     id: Any? = null,
-    block: suspend EffectExecution.Context<Environment, Action>.() -> Unit,
+    block: suspend Context<Environment, Action, State>.() -> Unit,
 ) {
-    val effect = object : EffectExecution<Environment, Action> {
+    val effect = object : EffectExecution<Environment, Action, State> {
         override val id: Any? = id
-        override val block: suspend EffectExecution.Context<Environment, Action>.() -> Unit = block
+        override val block: suspend Context<Environment, Action, State>.() -> Unit = block
     }
     add(effect)
 }
@@ -103,12 +105,12 @@ fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.
 /**
  * Creates and adds an [EffectCancellation] in the context of a [Reducer.reduce].
  *
- * @param ids A list of IDs of the [Effect]s to be cancelled.
+ * @param id An ID of the [Effect]s to be cancelled.
  */
-fun <Environment, Action> Reducer.Context<Environment, Action>.cancelEffect(
+fun <Environment, Action, State> Reducer.Context<Environment, Action, State>.cancelEffect(
     id: Any,
 ) {
-    val effect = object : EffectCancellation<Environment, Action> {
+    val effect = object : EffectCancellation<Environment, Action, State> {
         override val ids: List<Any> = listOf(id)
     }
     add(effect)
@@ -117,12 +119,12 @@ fun <Environment, Action> Reducer.Context<Environment, Action>.cancelEffect(
 /**
  * Creates and adds an [EffectCancellation] in the context of a [DelegateStore.expandState].
  *
- * @param ids A list of IDs of the [Effect]s to be cancelled.
+ * @param id An ID of the [Effect]s to be cancelled.
  */
-fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.cancelEffect(
+fun <Environment, Action, State> DelegateStore.ExpandStateContext<Environment, Action, State>.cancelEffect(
     id: Any,
 ) {
-    val effect = object : EffectCancellation<Environment, Action> {
+    val effect = object : EffectCancellation<Environment, Action, State> {
         override val ids: List<Any> = listOf(id)
     }
     add(effect)
@@ -133,10 +135,10 @@ fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.
  *
  * @param ids A list of IDs of the [Effect]s to be cancelled.
  */
-fun <Environment, Action> Reducer.Context<Environment, Action>.cancelEffects(
+fun <Environment, Action, State> Reducer.Context<Environment, Action, State>.cancelEffects(
     ids: List<Any>,
 ) {
-    val effect = object : EffectCancellation<Environment, Action> {
+    val effect = object : EffectCancellation<Environment, Action, State> {
         override val ids: List<Any> = ids
     }
     add(effect)
@@ -147,10 +149,10 @@ fun <Environment, Action> Reducer.Context<Environment, Action>.cancelEffects(
  *
  * @param ids A list of IDs of the [Effect]s to be cancelled.
  */
-fun <Environment, Action> DelegateStore.ExpandStateContext<Environment, Action>.cancelEffects(
+fun <Environment, Action, State> DelegateStore.ExpandStateContext<Environment, Action, State>.cancelEffects(
     ids: List<Any>,
 ) {
-    val effect = object : EffectCancellation<Environment, Action> {
+    val effect = object : EffectCancellation<Environment, Action, State> {
         override val ids: List<Any> = ids
     }
     add(effect)
