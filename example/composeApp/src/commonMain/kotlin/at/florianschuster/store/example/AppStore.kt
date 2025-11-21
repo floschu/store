@@ -3,7 +3,6 @@ package at.florianschuster.store.example
 import at.florianschuster.store.Store
 import at.florianschuster.store.StoreEvents
 import at.florianschuster.store.delegate
-import at.florianschuster.store.effect
 import at.florianschuster.store.scopeAction
 import at.florianschuster.store.example.login.LoginAction
 import at.florianschuster.store.example.login.LoginEnvironment
@@ -17,6 +16,7 @@ import at.florianschuster.store.example.service.MockInputValidator
 import at.florianschuster.store.example.service.MockAuthenticationService
 import at.florianschuster.store.example.service.MockSearchRepository
 import at.florianschuster.store.example.service.MockTokenRepository
+import at.florianschuster.store.example.service.TokenRepository
 import kotlinx.coroutines.CoroutineScope
 
 internal sealed interface AppAction {
@@ -34,12 +34,17 @@ internal data class AppState(
 internal class AppStore(
     effectScope: CoroutineScope,
     initialState: AppState = AppState(),
+    tokenRepository: TokenRepository = MockTokenRepository(),
+    navigationEnvironment: NavigationEnvironment = NavigationEnvironment(
+        tokenRepository = tokenRepository,
+    ),
     loginEnvironment: LoginEnvironment = LoginEnvironment(
         inputValidator = MockInputValidator(),
         authenticationService = MockAuthenticationService(),
-        tokenRepository = MockTokenRepository(),
+        tokenRepository = tokenRepository,
     ),
     searchEnvironment: SearchEnvironment = SearchEnvironment(
+        tokenRepository = tokenRepository,
         searchRepository = MockSearchRepository(),
     ),
 ) : Store<Unit, AppAction, AppState> by Store(
@@ -47,9 +52,10 @@ internal class AppStore(
     effectScope = effectScope,
     environment = Unit,
     delegates = listOf(
-        NavigationStore(
-            scope = effectScope,
-        ).delegate(
+        NavigationReducer.delegate(
+            initialState = NavigationState(),
+            environment = navigationEnvironment,
+            effectScope = effectScope,
             scopeAction = scopeAction(AppAction.Navigation::action),
             expandState = { appState, navigationState -> appState.copy(navigationState = navigationState) },
         ),
@@ -59,14 +65,7 @@ internal class AppStore(
             scope = effectScope,
         ).delegate(
             scopeAction = scopeAction(AppAction.Login::action),
-            expandState = { appState, loginState ->
-                if (loginState.isAuthenticated) {
-                    effect("effect_navigate_to_search") {
-                        dispatch(AppAction.Navigation(NavigationAction.GoTo(NavigationState.Route.Search)))
-                    }
-                }
-                appState.copy(loginState = loginState)
-            },
+            expandState = { appState, loginState -> appState.copy(loginState = loginState) },
         ),
         SearchReducer.delegate(
             initialState = initialState.searchState,

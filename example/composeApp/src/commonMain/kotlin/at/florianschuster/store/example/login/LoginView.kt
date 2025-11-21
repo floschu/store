@@ -45,7 +45,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 internal fun LoginView(
     state: LoginState,
     dispatch: (LoginAction) -> Unit = {},
-    onGoToSearch: () -> Unit = {},
     paddingValues: PaddingValues = PaddingValues(),
 ) {
     Column(

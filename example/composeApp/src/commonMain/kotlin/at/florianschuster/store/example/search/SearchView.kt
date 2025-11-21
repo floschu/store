@@ -1,6 +1,7 @@
 package at.florianschuster.store.example.search
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -8,13 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
@@ -44,41 +45,55 @@ internal fun SearchView(
 ) {
     val layoutDirection = LocalLayoutDirection.current
     Column(modifier = Modifier.fillMaxSize()) {
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier
                 .padding(
                     top = paddingValues.calculateTopPadding(),
                     start = paddingValues.calculateStartPadding(layoutDirection),
                     end = paddingValues.calculateEndPadding(layoutDirection),
                 )
-                .padding(horizontal = AppTheme.dimensions.large),
-            value = state.query,
-            onValueChange = { dispatch(SearchAction.QueryChanged(it)) },
-            label = { Text("Search") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search"
-                )
-            },
-            trailingIcon = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (state.loading) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                    }
-                    if (state.query.isNotEmpty()) {
-                        IconButton(
-                            onClick = { dispatch(SearchAction.ResetQuery) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Clear"
-                            )
+                .padding(horizontal = AppTheme.dimensions.medium),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppTheme.dimensions.small),
+        ) {
+            OutlinedTextField(
+                modifier = Modifier.weight(1f),
+                value = state.query,
+                onValueChange = { dispatch(SearchAction.QueryChanged(it)) },
+                label = { Text("Search") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search"
+                    )
+                },
+                trailingIcon = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (state.loading) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        }
+                        if (state.query.isNotEmpty()) {
+                            IconButton(
+                                onClick = { dispatch(SearchAction.ResetQuery) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Clear"
+                                )
+                            }
                         }
                     }
                 }
+            )
+            IconButton(
+                onClick = { dispatch(SearchAction.Logout) }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.Logout,
+                    contentDescription = "logout",
+                )
             }
-        )
+        }
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(

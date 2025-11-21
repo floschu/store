@@ -4,6 +4,8 @@ import at.florianschuster.store.example.NavigationAction.GoTo
 import at.florianschuster.store.example.NavigationState.Route
 import at.florianschuster.store.example.login.LoginAction
 import at.florianschuster.store.example.search.SearchAction
+import at.florianschuster.store.example.service.MockTokenRepository
+import at.florianschuster.store.example.service.Token
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -16,7 +18,10 @@ class AppStoreTest {
 
     @Test
     fun `when NavigationAction dispatched - then delegated to NavigationStore`() = runTest {
-        val sut = AppStore(backgroundScope)
+        val tokenRepository = MockTokenRepository().apply {
+            store(Token("valid"))
+        }
+        val sut = AppStore(backgroundScope, tokenRepository = tokenRepository)
         sut.dispatch(AppAction.Navigation(GoTo(Route.Search)))
         runCurrent()
         assertEquals(Route.Search, sut.state.value.navigationState.route)

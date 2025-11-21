@@ -56,7 +56,6 @@ fun App() {
                             paddingValues = paddingValues,
                             state = state.loginState,
                             dispatch = { store.dispatch(AppAction.Login(it)) },
-                            onGoToSearch = { store.dispatch(Navigation(NavigationAction.GoTo(Search))) }
                         )
                     }
 

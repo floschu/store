@@ -3,8 +3,8 @@ package at.florianschuster.store.example.login
 import at.florianschuster.store.example.login.LoginStoreTest.Setup.Companion.TestToken
 import at.florianschuster.store.example.service.AuthenticationService
 import at.florianschuster.store.example.service.InputValidator
+import at.florianschuster.store.example.service.MockTokenRepository
 import at.florianschuster.store.example.service.Token
-import at.florianschuster.store.example.service.TokenRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -15,6 +15,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class LoginStoreTest {
+
     private class Setup(scope: CoroutineScope) {
         var givenEmailValid = true
         var givenPasswordValid = true
@@ -31,19 +32,14 @@ class LoginStoreTest {
             }
         }
 
-        var storedToken: Token? = null
-        val testTokenRepository = object : TokenRepository {
-            override suspend fun store(token: Token) {
-                storedToken = token
-            }
-        }
+        val tokenRepository = MockTokenRepository()
 
         val sut = LoginStore(
             initialState = LoginState(),
             environment = LoginEnvironment(
                 inputValidator = testInputValidator,
                 authenticationService = testAuthenticationService,
-                tokenRepository = testTokenRepository
+                tokenRepository = tokenRepository
             ),
             scope = scope
         )
@@ -99,7 +95,7 @@ class LoginStoreTest {
             sut.dispatch(LoginAction.Authenticate)
             runCurrent()
 
-            assertNull(storedToken)
+            assertNull(tokenRepository.token.value)
             assertEquals(LoginState.AuthenticationResult.Uninitialized, currentState.authenticationResult)
         }
     }
@@ -121,7 +117,7 @@ class LoginStoreTest {
             sut.dispatch(LoginAction.Authenticate)
             runCurrent()
 
-            assertNull(storedToken)
+            assertNull(tokenRepository.token.value)
             assertEquals(LoginState.AuthenticationResult.Uninitialized, currentState.authenticationResult)
         }
     }
@@ -140,7 +136,7 @@ class LoginStoreTest {
             runCurrent()
 
             assertEquals(LoginState.AuthenticationResult.Failure, currentState.authenticationResult)
-            assertNull(storedToken)
+            assertNull(tokenRepository.token.value)
         }
     }
 
@@ -163,7 +159,7 @@ class LoginStoreTest {
                 runCurrent()
 
                 assertEquals(LoginState.AuthenticationResult.Success, currentState.authenticationResult)
-                assertEquals(TestToken, storedToken)
+                assertEquals(TestToken, tokenRepository.token.value)
             }
         }
 }

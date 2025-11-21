@@ -34,7 +34,6 @@ internal data class LoginState(
     val authenticationResult: AuthenticationResult = AuthenticationResult.Uninitialized
 ) {
     val canLogIn: Boolean = emailValid == true && passwordValid == true
-    val isAuthenticated: Boolean = authenticationResult is AuthenticationResult.Success
 
     sealed interface AuthenticationResult {
         data object Uninitialized : AuthenticationResult

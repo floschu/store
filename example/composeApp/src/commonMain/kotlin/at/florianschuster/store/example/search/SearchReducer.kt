@@ -5,10 +5,12 @@ import at.florianschuster.store.Reducer
 import at.florianschuster.store.cancelEffect
 import at.florianschuster.store.effect
 import at.florianschuster.store.example.service.SearchRepository
+import at.florianschuster.store.example.service.TokenRepository
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
 internal data class SearchEnvironment(
+    val tokenRepository: TokenRepository,
     val searchRepository: SearchRepository,
 )
 
@@ -16,6 +18,7 @@ internal sealed interface SearchAction {
     data class QueryChanged(val query: String) : SearchAction
     data class ItemsLoaded(val items: List<String>) : SearchAction
     data object ResetQuery : SearchAction
+    data object Logout : SearchAction
 }
 
 @Immutable
@@ -55,6 +58,13 @@ internal val SearchReducer = Reducer<SearchEnvironment, SearchAction, SearchStat
                 query = "",
                 items = emptyList(),
             )
+        }
+
+        is SearchAction.Logout -> {
+            effect("effect_logout") {
+                environment.tokenRepository.clear()
+            }
+            previousState
         }
     }
 }

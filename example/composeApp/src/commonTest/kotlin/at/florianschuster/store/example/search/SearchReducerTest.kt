@@ -1,13 +1,18 @@
 package at.florianschuster.store.example.search
 
 import at.florianschuster.store.Store
+import at.florianschuster.store.example.service.MockTokenRepository
 import at.florianschuster.store.example.service.SearchRepository
+import at.florianschuster.store.example.service.Token
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -21,10 +26,10 @@ class SearchReducerTest {
                 return TestQueryResult
             }
         }
-
+        val tokenRepository = MockTokenRepository()
         val sut = Store(
             initialState = SearchState(),
-            environment = SearchEnvironment(testSearchRepository),
+            environment = SearchEnvironment(tokenRepository, testSearchRepository),
             effectScope = scope,
             reducer = SearchReducer
         )
@@ -82,4 +87,17 @@ class SearchReducerTest {
                 assertTrue(executedQueries.isEmpty())
             }
         }
+
+    @Test
+    fun `when Logout dispatched - then token repository is cleared`() = runTest {
+        with(Setup(backgroundScope)) {
+            tokenRepository.store(Token("valid_token"))
+            assertNotNull(tokenRepository.token.value)
+
+            sut.dispatch(SearchAction.Logout)
+
+            runCurrent()
+            assertNull(tokenRepository.token.value)
+        }
+    }
 }
