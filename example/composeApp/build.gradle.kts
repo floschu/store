@@ -12,7 +12,9 @@ plugins {
 kotlin {
     androidTarget {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+            jvmTarget.set(
+                JvmTarget.fromTarget(File("../.java-version").readText())
+            )
         }
     }
 

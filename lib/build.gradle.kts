@@ -37,7 +37,11 @@ kotlin {
     }
 
     jvm {
-        compilerOptions { jvmTarget.set(JvmTarget.JVM_1_8) }
+        compilerOptions {
+            jvmTarget.set(
+                JvmTarget.fromTarget(File("../.java-version").readText())
+            )
+        }
         testRuns["test"].executionTask.configure { useJUnit() }
     }
 
