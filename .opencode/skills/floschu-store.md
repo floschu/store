@@ -21,6 +21,30 @@ The library follows a Redux/Flux-like pattern:
 - **Effects**: Async side effects (network, database, etc.)
 - **Environment**: Dependency container for effects
 
+ ```
+                      dispatch(Action)
+view ▶──────────────────────┬◀─────────────────────────────┐
+                            │                               │
+                            │                               │
+     ┏━━━━━━━━━━━━━━━━━━━━━━▼━━━━━━━━━━━━━━━━━━━━━┓         │
+     ┃ Store                │ actions             ┃         │
+     ┃ with Environment     │                     ┃         │
+     ┃                ┏━━━━━▼━━━━━┓               ┃  ┏━━━━━━━━━━━━━━┓
+     ┃  ┌────────────▶┃  reducer  ┃ ─ ─ ─ ─ ─ ─ ─ - ─▶    effect    ┃
+     ┃  │             ┗━━━━━━━━━━━┛  can produce  ┃  ┗━━━━━━━━━━━━━━┛
+     ┃  │                   │                     ┃   uses Environment
+     ┃  │ previous          │                     ┃
+     ┃  │ state             │ new state           ┃
+     ┃  │                   │                     ┃
+     ┃  │             ┏━━━━━▼━━━━━┓               ┃
+     ┃  └─────────────┃   State   ┃               ┃
+     ┃                ┗━━━━━━━━━━━┛               ┃
+     ┃                      │                     ┃
+     ┗━━━━━━━━━━━━━━━━━━━━━━▼━━━━━━━━━━━━━━━━━━━━━┛
+                            │
+view ◀─────────────────────┘
+```
+
 ## Implementation Patterns
 
 ### 1. Define the Components
