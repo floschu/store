@@ -9,12 +9,12 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
+val jenvContent = File("../.java-version").readText().trim()
+
 kotlin {
     androidTarget {
         compilerOptions {
-            jvmTarget.set(
-                JvmTarget.fromTarget(File("../.java-version").readText())
-            )
+            jvmTarget.set(JvmTarget.fromTarget(jenvContent))
         }
     }
 
@@ -95,8 +95,9 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        val javaVersion = JavaVersion.toVersion(jenvContent)
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 }
 

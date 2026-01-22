@@ -155,24 +155,33 @@ internal class EffectHandler<Environment, Action, State>(
 
                     is EffectExecution<Environment, Action, State> -> {
                         val effectId = effect.id
-                        // only launch effect if it is not already launched
-                        if (effectId != null && executionJobList.isActive(effectId)) {
-                            continue
-                        }
-                        // launch new effect
-                        val newJob = launch { effect.block(executionContext) }
-                        events?.emit(StoreEvent.Effect.Launch(effectId))
-                        newJob.invokeOnCompletion { cause ->
-                            if (cause is CancellationException && effectId != null) {
-                                events?.emit(StoreEvent.Effect.Cancel(effectId))
-                            } else {
-                                events?.emit(StoreEvent.Effect.Complete(effectId))
+                        // If effect has an ID, use atomic check-and-add to prevent race conditions
+                        if (effectId != null) {
+                            val newJob = executionJobList.launchIfNotActive(effectId) {
+                                launch { effect.block(executionContext) }
                             }
-                        }
-                        // only track job if it has id and has not already completed
-                        if (effectId != null && !newJob.isCompleted) {
-                            val item = ExecutionJobList.JobItem(effectId = effectId, job = newJob)
-                            executionJobList.add(item)
+                            if (newJob != null) {
+                                events?.emit(StoreEvent.Effect.Launch(effectId))
+                                newJob.invokeOnCompletion { cause ->
+                                    if (cause is CancellationException) {
+                                        events?.emit(StoreEvent.Effect.Cancel(effectId))
+                                    } else {
+                                        events?.emit(StoreEvent.Effect.Complete(effectId))
+                                    }
+                                }
+                            }
+                            // If newJob is null, effect was already active - skip
+                        } else {
+                            // No effect ID - just launch without tracking
+                            val newJob = launch { effect.block(executionContext) }
+                            events?.emit(StoreEvent.Effect.Launch(effectId))
+                            newJob.invokeOnCompletion { cause ->
+                                if (cause is CancellationException) {
+                                    events?.emit(StoreEvent.Effect.Cancel(effectId))
+                                } else {
+                                    events?.emit(StoreEvent.Effect.Complete(effectId))
+                                }
+                            }
                         }
                     }
                 }
@@ -192,17 +201,32 @@ internal class EffectHandler<Environment, Action, State>(
         private val mutex = Mutex()
         internal val items = mutableListOf<JobItem>()
 
-        suspend fun isActive(id: Any): Boolean = mutex.withLock {
-            val item = items.firstOrNull { it.effectId == id }
-            item != null && item.job.isActive
-        }
-
-        suspend fun add(jobItem: JobItem) {
-            suspend fun remove() = mutex.withLock { items.remove(jobItem) }
-            mutex.withLock {
-                items.add(jobItem)
-                jobItem.job.invokeOnCompletion { effectScope.launch { remove() } }
+        /**
+         * Atomically checks if an effect with the given ID is already active.
+         * If not active, launches the job and adds it to tracking.
+         * Returns the launched Job if successful, or null if the effect was already active.
+         * 
+         * This method prevents race conditions by combining the check and add
+         * operations within a single mutex lock.
+         */
+        suspend fun launchIfNotActive(id: Any, createJob: () -> Job): Job? = mutex.withLock {
+            // Check if already active while holding lock
+            val existingItem = items.firstOrNull { it.effectId == id }
+            if (existingItem != null && existingItem.job.isActive) {
+                return@withLock null  // Already active, don't create new job
             }
+            // Create and add the job while still holding lock
+            val job = createJob()
+            if (!job.isCompleted) {
+                val item = JobItem(effectId = id, job = job)
+                items.add(item)
+                job.invokeOnCompletion { 
+                    effectScope.launch { 
+                        mutex.withLock { items.remove(item) } 
+                    } 
+                }
+            }
+            job
         }
 
         suspend fun cancel(ids: List<Any>) {
