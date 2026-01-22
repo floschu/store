@@ -28,7 +28,7 @@ see [changelog](https://github.com/floschu/store/blob/main/CHANGELOG.md) for ver
 
 Go to [store](https://github.com/floschu/store/blob/main/lib/src/commonMain/kotlin/at/florianschuster/store/Store.kt) as entry point for more information.
 
-For AI coding agents, see the [agent skill](.opencode/skills/floschu-store/SKILL.md) for implementation patterns, debugging tips, and testing guidance.
+Check out the [store skill](skills/floschu-store.md) to implement and test `store` with your **AI agents**.
 
 ```kotlin
 class LoginEnvironment(

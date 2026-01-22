@@ -1,11 +1,6 @@
 ---
 name: floschu-store
 description: Implement, debug, and test floschu/store - a unidirectional data flow state management kmp library with coroutines
-license: Apache-2.0
-compatibility: opencode
-metadata:
-  language: kotlin
-  framework: kotlin-multiplatform
 ---
 
 # floschu/store - Kotlin State Management
