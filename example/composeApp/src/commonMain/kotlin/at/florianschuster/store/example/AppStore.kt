@@ -53,7 +53,7 @@ internal class AppStore(
     environment = Unit,
     delegates = listOf(
         NavigationReducer.delegate(
-            initialState = NavigationState(),
+            initialState = initialState.navigationState,
             environment = navigationEnvironment,
             effectScope = effectScope,
             scopeAction = scopeAction(AppAction.Navigation::action),

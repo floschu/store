@@ -49,8 +49,15 @@ fun App() {
             AnimatedContent(
                 targetState = state.navigationState.route,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
-            ) { route ->
-                when (val route = state.navigationState.route) {
+                contentKey = { route ->
+                    when (route) {
+                        is Login -> "login"
+                        is Search -> "search"
+                        is Detail -> "detail-${route.id}"
+                    }
+                },
+            ) { targetRoute ->
+                when (targetRoute) {
                     is Login -> {
                         LoginView(
                             paddingValues = paddingValues,
@@ -70,7 +77,7 @@ fun App() {
 
                     is Detail -> DetailView(
                         paddingValues = paddingValues,
-                        state = DetailState(route.id),
+                        state = DetailState(targetRoute.id),
                     )
                 }
             }
