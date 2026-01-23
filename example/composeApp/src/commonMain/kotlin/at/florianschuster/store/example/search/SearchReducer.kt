@@ -4,8 +4,10 @@ import androidx.compose.runtime.Immutable
 import at.florianschuster.store.Reducer
 import at.florianschuster.store.cancelEffect
 import at.florianschuster.store.effect
+import at.florianschuster.store.example.Log
 import at.florianschuster.store.example.service.SearchRepository
 import at.florianschuster.store.example.service.TokenRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -31,12 +33,31 @@ internal data class SearchState(
 internal val SearchReducer = Reducer<SearchEnvironment, SearchAction, SearchState> { previousState, action ->
     when (action) {
         is SearchAction.QueryChanged -> {
-            // if a new query is entered, we cancel the previous effect
+            // Cancel any previous search effect
             cancelEffect(id = SearchAction.QueryChanged::class)
+
+            // Don't trigger search for empty queries - just clear results
+            if (action.query.isEmpty()) {
+                return@Reducer previousState.copy(
+                    query = "",
+                    items = emptyList(),
+                    loading = false,
+                )
+            }
+
             effect(id = SearchAction.QueryChanged::class) {
                 delay(300.milliseconds) // we debounce the search query
-                val items = environment.searchRepository.loadQueryItems(action.query)
-                dispatch(SearchAction.ItemsLoaded(items))
+                runCatching { environment.searchRepository.loadQueryItems(action.query) }.fold(
+                    onSuccess = { items -> dispatch(SearchAction.ItemsLoaded(items)) },
+                    onFailure = { error ->
+                        Log.e(error)
+                        // On error, dispatch empty results to clear loading state
+                        // and avoid leaving the UI in a loading state forever
+                        if (error !is CancellationException) {
+                            dispatch(SearchAction.ItemsLoaded(emptyList()))
+                        }
+                    }
+                )
             }
             previousState.copy(
                 query = action.query,
@@ -57,6 +78,7 @@ internal val SearchReducer = Reducer<SearchEnvironment, SearchAction, SearchStat
             previousState.copy(
                 query = "",
                 items = emptyList(),
+                loading = false,
             )
         }
 

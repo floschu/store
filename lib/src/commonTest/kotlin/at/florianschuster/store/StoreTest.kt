@@ -2,7 +2,9 @@ package at.florianschuster.store
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -213,5 +215,106 @@ internal class StoreTest {
             reducer = Reducer { _, _ -> error("error") },
         )
         assertFailsWith<IllegalStateException> { sut.dispatch(1) }
+    }
+
+    @Test
+    fun `destructuring operators work as expected`() = runTest {
+        val sut: Store<Unit, Int, Int> = Store(
+            initialState = 42,
+            effectScope = backgroundScope,
+            environment = Unit,
+            reducer = Reducer { previousState, action -> previousState + action },
+        )
+
+        val (state, dispatch) = sut
+
+        assertEquals(42, state.value)
+
+        dispatch(8)
+        assertEquals(50, state.value)
+
+        dispatch(10)
+        assertEquals(60, state.value)
+    }
+
+    @Test
+    fun `multiple effects can be cancelled at once`() = runTest {
+        var effect1Running = false
+        var effect2Running = false
+        var effect3Running = false
+
+        val sut: Store<Unit, String, Int> = Store(
+            initialState = 0,
+            effectScope = backgroundScope,
+            environment = Unit,
+            reducer = Reducer { previousState, action ->
+                when (action) {
+                    "start" -> {
+                        effect(id = "effect1") {
+                            effect1Running = true
+                            try {
+                                delay(10.seconds)
+                            } finally {
+                                effect1Running = false
+                            }
+                        }
+                        effect(id = "effect2") {
+                            effect2Running = true
+                            try {
+                                delay(10.seconds)
+                            } finally {
+                                effect2Running = false
+                            }
+                        }
+                        effect(id = "effect3") {
+                            effect3Running = true
+                            try {
+                                delay(10.seconds)
+                            } finally {
+                                effect3Running = false
+                            }
+                        }
+                        previousState
+                    }
+                    "cancelMultiple" -> {
+                        cancelEffects(ids = listOf("effect1", "effect2"))
+                        previousState
+                    }
+                    else -> previousState
+                }
+            },
+        )
+
+        sut.dispatch("start")
+        runCurrent()
+        assertEquals(true, effect1Running)
+        assertEquals(true, effect2Running)
+        assertEquals(true, effect3Running)
+
+        sut.dispatch("cancelMultiple")
+        runCurrent()
+        assertEquals(false, effect1Running)
+        assertEquals(false, effect2Running)
+        assertEquals(true, effect3Running) // effect3 should still be running
+    }
+
+    @Test
+    fun `concurrent dispatches are handled safely`() = runTest {
+        val sut: Store<Unit, Int, Int> = Store(
+            initialState = 0,
+            effectScope = backgroundScope,
+            environment = Unit,
+            reducer = Reducer { previousState, action -> previousState + action },
+        )
+
+        // Dispatch many actions concurrently
+        repeat(100) {
+            launch {
+                sut.dispatch(1)
+            }
+        }
+        advanceUntilIdle()
+
+        assertEquals(100, sut.state.value)
     }
 }

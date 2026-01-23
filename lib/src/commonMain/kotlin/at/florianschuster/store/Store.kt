@@ -5,6 +5,30 @@ import kotlinx.coroutines.flow.StateFlow
 
 /**
  * A store that holds [State] and allows dispatching [Action]s.
+ *
+ * ```
+ *                      dispatch(Action)
+ *  view ▶──────────────────────┬◀──────────────────────────────┐
+ *                              │                               │
+ *                              │                               │
+ *       ┏━━━━━━━━━━━━━━━━━━━━━━▼━━━━━━━━━━━━━━━━━━━━━┓         │
+ *       ┃ Store                │ actions             ┃         │
+ *       ┃ with Environment     │                     ┃         │
+ *       ┃                ┏━━━━━▼━━━━━┓               ┃  ┏━━━━━━━━━━━━━━┓
+ *       ┃  ┌────────────▶┃  reducer  ┃ ─ ─ ─ ─ ─ ─ ─ - ─▶    effect    ┃
+ *       ┃  │             ┗━━━━━━━━━━━┛  can produce  ┃  ┗━━━━━━━━━━━━━━┛
+ *       ┃  │                   │                     ┃   uses Environment
+ *       ┃  │ previous          │                     ┃
+ *       ┃  │ state             │ new state           ┃
+ *       ┃  │                   │                     ┃
+ *       ┃  │             ┏━━━━━▼━━━━━┓               ┃
+ *       ┃  └─────────────┃   State   ┃               ┃
+ *       ┃                ┗━━━━━━━━━━━┛               ┃
+ *       ┃                      │                     ┃
+ *       ┗━━━━━━━━━━━━━━━━━━━━━━▼━━━━━━━━━━━━━━━━━━━━━┛
+ *                              │
+ * view ◀───────────────────────┘
+ * ```
  */
 interface Store<Environment, Action, State> {
     val state: StateFlow<State>

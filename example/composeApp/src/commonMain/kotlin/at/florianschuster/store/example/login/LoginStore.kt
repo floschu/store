@@ -75,10 +75,13 @@ internal class LoginStore(
                 // This effect has an Id, so it will not be executed if this authentication
                 // effect is already in progress.
                 effect(id = LoginAction.Authenticate) {
+                    // Use state.value to get the current state at execution time,
+                    // not the captured previousState which could be stale
+                    val currentState = state.value
                     runCatching {
                         environment.authenticationService.authenticate(
-                            checkNotNull(previousState.email),
-                            checkNotNull(previousState.password),
+                            checkNotNull(currentState.email),
+                            checkNotNull(currentState.password),
                         )
                     }.fold(
                         onSuccess = { token ->

@@ -1,5 +1,11 @@
 # changelog
 
+## `[0.5.0]` - 2025-01-22
+
+- Update kotlin to `2.3.0`
+- Fix concurrency bug in `Implementation.kt`
+- Add agent skill for AI coding assistants (`.opencode/skills/floschu-store/SKILL.md`)
+
 ## `[0.4.0]` - 2025-11-21
 
 - Add `val state: StateFlow<State>` to `EffectExecution.Context`

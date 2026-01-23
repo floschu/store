@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -111,7 +110,6 @@ internal fun SearchView(
                         modifier = Modifier.fillMaxSize(),
                         text = if (state.query.isEmpty()) "Please enter a Query" else "No items found.",
                         textAlign = TextAlign.Center,
-                        color = if (state.query.isEmpty()) Color.Unspecified else AppTheme.colorScheme.error,
                     )
                 }
             }

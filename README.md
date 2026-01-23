@@ -28,6 +28,8 @@ see [changelog](https://github.com/floschu/store/blob/main/CHANGELOG.md) for ver
 
 Go to [store](https://github.com/floschu/store/blob/main/lib/src/commonMain/kotlin/at/florianschuster/store/Store.kt) as entry point for more information.
 
+Check out the [store skill](skills/floschu-store.md) to implement and test `store` with your **AI agents**.
+
 ```kotlin
 class LoginEnvironment(
     val authenticationService: AuthenticationService,
