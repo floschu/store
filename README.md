@@ -28,8 +28,6 @@ see [changelog](https://github.com/floschu/store/blob/main/CHANGELOG.md) for ver
 
 Go to [store](https://github.com/floschu/store/blob/main/lib/src/commonMain/kotlin/at/florianschuster/store/Store.kt) as entry point for more information.
 
-Check out the [store skill](skills/floschu-store.md) to implement and test `store` with your **AI agents**.
-
 ```kotlin
 class LoginEnvironment(
     val authenticationService: AuthenticationService,
@@ -97,6 +95,8 @@ class LoginStore(
 ```
 
 A more complex [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/) example can be found in the [example directory](https://github.com/floschu/store/blob/main/example).
+
+Check out the [store skill](skills/floschu-store.md) to implement and test `store` with your **AI agents**.
 
 ## author
 
