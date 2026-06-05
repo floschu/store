@@ -96,7 +96,7 @@ class LoginStore(
 
 A more complex [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/) example can be found in the [example directory](https://github.com/floschu/store/blob/main/example).
 
-Check out the [store skill](skills/floschu-store.md) to implement and test `store` with your **AI agents**.
+Check out the [store skill](skills/floschu-store) to implement and test `store` with your **AI agents**.
 
 ## author
 

@@ -1,6 +1,6 @@
 ---
 name: floschu-store
-description: Implement, debug, and test floschu/store - a unidirectional data flow state management kmp library with coroutines
+description: Use when implementing, debugging, or testing code that uses the floschu/store library. Triggers on tasks involving Store, Reducer, Actions, Effects, or Environment types from at.florianschuster.store; UDF state management in Kotlin Multiplatform projects; or migrating to or from the store library.
 ---
 
 # floschu/store - Kotlin State Management
